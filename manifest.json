@@ -1,0 +1,43 @@
+{
+  "name": "ELITE FITNESS",
+  "short_name": "Elite Fitness",
+  "description": "Gamified fitness app — train like Toji, level up like Jin-Woo. Progressive overload, XP system, AI personal trainer.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0C",
+  "theme_color": "#D4AF37",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Today's Workout",
+      "short_name": "Workout",
+      "description": "Start today's training session",
+      "url": "/?tab=workout",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Trainer",
+      "short_name": "AI Chat",
+      "description": "Ask your personal trainer anything",
+      "url": "/?tab=chat",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
