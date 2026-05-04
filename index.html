@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Elite Fitness">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════════
@@ -696,6 +697,76 @@ body.mode-jinwoo .ccb-chip{background:rgba(107,99,255,.1);border-color:rgba(107,
 /* ══════════════════════════════════════════════════════════
    MODE SELECTOR MODAL
 ══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   AUTH OVERLAY
+══════════════════════════════════════════════════════════ */
+.auth-overlay{
+  position:fixed;inset:0;z-index:7000;
+  background:rgba(0,0,0,.92);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  padding:1rem;
+}
+.auth-overlay.hidden{display:none;}
+.auth-modal{
+  background:#141414;border:1px solid rgba(255,255,255,.08);
+  border-radius:24px;width:100%;max-width:380px;
+  padding:2rem 1.8rem;
+  animation:prcPop .35s cubic-bezier(.34,1.56,.64,1);
+}
+.auth-logo{display:flex;justify-content:center;margin-bottom:.8rem;}
+.auth-title{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:4px;
+  text-align:center;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.2rem;}
+.auth-sub{font-size:.72rem;color:var(--muted);text-align:center;margin-bottom:1.5rem;line-height:1.5;}
+.auth-tabs{display:flex;background:rgba(255,255,255,.04);border-radius:10px;padding:.25rem;gap:.25rem;margin-bottom:1.2rem;}
+.auth-tab{flex:1;padding:.5rem;border-radius:8px;border:none;background:transparent;
+  color:var(--muted);font-weight:700;font-size:.75rem;cursor:pointer;
+  font-family:'Inter',sans-serif;letter-spacing:.5px;transition:all .2s;}
+.auth-tab.active{background:rgba(212,175,55,.12);color:var(--gold);border:1px solid rgba(212,175,55,.2);}
+.auth-in{
+  width:100%;padding:.8rem 1rem;background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.08);border-radius:12px;
+  color:var(--txt);font-family:'Inter',sans-serif;font-size:.88rem;
+  outline:none;transition:border-color .2s;margin-bottom:.7rem;
+  box-sizing:border-box;
+}
+.auth-in:focus{border-color:var(--gold);}
+.auth-in::placeholder{color:var(--dim);}
+.auth-btn{
+  width:100%;padding:.9rem;border-radius:12px;
+  background:linear-gradient(135deg,var(--gold),var(--golddk));
+  color:#000;font-weight:800;font-size:.88rem;border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;letter-spacing:.5px;transition:all .2s;
+  text-transform:uppercase;margin-bottom:.5rem;
+}
+.auth-btn:hover{box-shadow:0 6px 20px rgba(212,175,55,.4);}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed;}
+.auth-forgot{background:none;border:none;color:var(--muted);font-size:.7rem;
+  cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline;
+  display:block;text-align:center;width:100%;padding:.3rem;}
+.auth-divider{display:flex;align-items:center;gap:.8rem;margin:.8rem 0;color:var(--dim);font-size:.7rem;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line);}
+.auth-google-btn{
+  width:100%;padding:.8rem;border-radius:12px;
+  background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);
+  color:var(--txt);font-size:.82rem;font-weight:600;cursor:pointer;
+  font-family:'Inter',sans-serif;display:flex;align-items:center;
+  justify-content:center;gap:.7rem;transition:all .2s;
+}
+.auth-google-btn:hover{background:rgba(255,255,255,.09);}
+.auth-skip{background:none;border:none;color:var(--dim);font-size:.65rem;
+  cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline;
+  display:block;text-align:center;width:100%;margin-top:.9rem;padding:.3rem;}
+.auth-status{font-size:.72rem;text-align:center;margin-top:.7rem;min-height:1.2rem;line-height:1.5;}
+.auth-status.error{color:#E74C3C;}
+.auth-status.success{color:var(--green);}
+/* User avatar pill in topbar */
+.topbar-user{display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.3rem .6rem;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);transition:all .2s;}
+.topbar-user:hover{background:rgba(255,255,255,.09);}
+.topbar-user-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--golddk));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#000;flex-shrink:0;}
+.topbar-user-name{font-size:.65rem;font-weight:700;color:var(--txt);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.topbar-user-sync{font-size:.55rem;color:var(--muted);}
+
 .mode-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);
   z-index:4000;display:none;align-items:center;justify-content:center;padding:1rem;
@@ -1735,7 +1806,13 @@ body.mode-jinwoo .ccb-chip{background:rgba(107,99,255,.1);border-color:rgba(107,
   </div>
   <div class="header-right">
     <div class="xp-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="xp-badge-num" id="headerXP">0</span><span class="xp-badge-lbl">XP</span></div>
-    <div class="profile-avatar" id="headerAvatar" onclick="goTab('profile')">?</div>
+    <div class="topbar-user" id="topbarUser" onclick="topbarUserTap()">
+      <div class="topbar-user-avatar" id="headerAvatar">?</div>
+      <div>
+        <div class="topbar-user-name" id="topbarUserName">Guest</div>
+        <div class="topbar-user-sync" id="topbarUserSync" style="display:none;"></div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -2846,6 +2923,60 @@ body.mode-jinwoo .ccb-chip{background:rgba(107,99,255,.1);border-color:rgba(107,
   </button>
 </nav>
 
+<!-- ════ AUTH OVERLAY — Login / Signup ════ -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-modal">
+    <div class="auth-logo">
+      <svg width="32" height="32" viewBox="0 0 40 24" fill="none">
+        <rect x="2" y="7" width="6" height="10" rx="2" fill="var(--gold)"/>
+        <rect x="0" y="5" width="4" height="14" rx="2" fill="var(--golddk)"/>
+        <rect x="32" y="7" width="6" height="10" rx="2" fill="var(--gold)"/>
+        <rect x="36" y="5" width="4" height="14" rx="2" fill="var(--golddk)"/>
+        <rect x="8" y="10" width="24" height="4" rx="2" fill="var(--gold)"/>
+      </svg>
+    </div>
+    <div class="auth-title">ELITE FITNESS</div>
+    <div class="auth-sub">Your progress. Any device. Always synced.</div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">LOGIN</button>
+      <button class="auth-tab" id="authTabSignup" onclick="switchAuthTab('signup')">SIGN UP</button>
+    </div>
+
+    <!-- Login form -->
+    <div id="authLoginForm">
+      <input class="auth-in" id="authLoginEmail" type="email" placeholder="Email address" autocomplete="email">
+      <input class="auth-in" id="authLoginPass"  type="password" placeholder="Password" autocomplete="current-password">
+      <button class="auth-btn" onclick="authLogin()">LOGIN →</button>
+      <button class="auth-forgot" onclick="authForgot()">Forgot password?</button>
+    </div>
+
+    <!-- Signup form -->
+    <div id="authSignupForm" style="display:none;">
+      <input class="auth-in" id="authSignupName"  type="text"     placeholder="Your name" maxlength="20">
+      <input class="auth-in" id="authSignupEmail" type="email"    placeholder="Email address" autocomplete="email">
+      <input class="auth-in" id="authSignupPass"  type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
+      <button class="auth-btn" onclick="authSignup()">CREATE ACCOUNT →</button>
+    </div>
+
+    <!-- Divider -->
+    <div class="auth-divider"><span>or</span></div>
+
+    <!-- Google OAuth -->
+    <button class="auth-google-btn" onclick="authGoogle()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Continue with Google
+    </button>
+
+    <!-- Skip option -->
+    <button class="auth-skip" onclick="authSkip()">Use without account (local only)</button>
+
+    <!-- Status message -->
+    <div class="auth-status" id="authStatus"></div>
+  </div>
+</div>
+
 <!-- ════ MODE SELECTOR MODAL ════ -->
 <div class="mode-overlay" id="modeOverlay" onclick="if(event.target===this)closeModeSelector()">
   <div class="mode-modal">
@@ -3058,8 +3189,131 @@ body.mode-jinwoo .ccb-chip{background:rgba(107,99,255,.1);border-color:rgba(107,
 
 <script>
 /* ═══ STORAGE ═══ */
-const S=(k,v)=>{try{localStorage.setItem('ef_'+k,JSON.stringify(v))}catch(e){}};
-const L=(k,d)=>{try{const v=localStorage.getItem('ef_'+k);return v!==null?JSON.parse(v):d}catch(e){return d}};
+/* ══════════════════════════════════════════════════════
+   SUPABASE CONFIG
+   Replace these with your actual project values from
+   https://supabase.com → Project Settings → API
+══════════════════════════════════════════════════════ */
+const SUPABASE_URL = 'https://cicfcpsptaxmrsjhpved.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpY2ZjcHNwdGF4bXJzamhwdmVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyNzY1NTQsImV4cCI6MjA2MTg1MjU1NH0.placeholder_replace_with_real_key';
+let _sb = null; // supabase client, initialized after SDK loads
+let _currentUser = null; // logged-in user
+let _syncQueue = []; // offline queue
+
+function getSB(){
+  if(_sb) return _sb;
+  if(window.supabase){
+    _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    return _sb;
+  }
+  return null;
+}
+
+/* ═══ STORAGE — dual write (localStorage + Supabase) ═══ */
+const S=(k,v)=>{
+  try{ localStorage.setItem('ef_'+k, JSON.stringify(v)); }catch(e){}
+  // Queue cloud sync for key data
+  if(_currentUser && ['xp','wos','profile','streak','mxp','prs','prc','history','activeMode','normalGoal','normalSplit','txp','sxp'].includes(k)){
+    _queueSync(k, v);
+  }
+};
+const L=(k,d)=>{
+  try{ const v=localStorage.getItem('ef_'+k); return v!==null?JSON.parse(v):d; }catch(e){ return d; }
+};
+
+/* Queue a sync operation — debounced to avoid too many writes */
+let _syncTimeout = null;
+function _queueSync(k, v){
+  _syncQueue.push({k, v, t: Date.now()});
+  clearTimeout(_syncTimeout);
+  _syncTimeout = setTimeout(()=>_flushSync(), 2000);
+}
+
+async function _flushSync(){
+  if(!_currentUser || !getSB() || _syncQueue.length===0) return;
+  const uid = _currentUser.id;
+  const sb  = getSB();
+  try {
+    // Build progress object from queue
+    const progress = {};
+    _syncQueue.forEach(({k,v}) => { progress[k] = v; });
+    _syncQueue = [];
+
+    // Upsert user_progress row
+    const progKeys = ['xp','wos','streak','mxp','prs','prc','txp','sxp','activeMode','normalGoal','normalSplit'];
+    const progData = {};
+    progKeys.forEach(k=>{ if(progress[k]!==undefined) progData[k]=progress[k]; });
+    if(Object.keys(progData).length){
+      await sb.from('user_progress').upsert({user_id:uid, ...progData, updated_at: new Date().toISOString()});
+    }
+    // Upsert profile
+    if(progress.profile){
+      await sb.from('profiles').upsert({id:uid, ...progress.profile, updated_at: new Date().toISOString()});
+    }
+    // Sync history (only new entries)
+    if(progress.history && Array.isArray(progress.history) && progress.history.length){
+      const newest = progress.history.slice(0,5); // sync last 5
+      const rows = newest.map(h=>({user_id:uid, ...h, date: h.date||new Date().toISOString()}));
+      await sb.from('workout_history').upsert(rows, {onConflict:'user_id,date'});
+    }
+  } catch(e){ console.warn('Sync error:', e); }
+}
+
+/* Pull all data from Supabase → populate localStorage */
+async function _pullFromCloud(){
+  if(!_currentUser || !getSB()) return;
+  const uid = _currentUser.id;
+  const sb  = getSB();
+  try {
+    showSyncStatus('☁️ Syncing your data…');
+    // Pull progress
+    const {data:prog} = await sb.from('user_progress').select('*').eq('user_id',uid).single();
+    if(prog){
+      const keys=['xp','wos','streak','mxp','prs','prc','txp','sxp','activeMode','normalGoal','normalSplit'];
+      keys.forEach(k=>{ if(prog[k]!==undefined) localStorage.setItem('ef_'+k, JSON.stringify(prog[k])); });
+    }
+    // Pull profile
+    const {data:prof} = await sb.from('profiles').select('*').eq('id',uid).single();
+    if(prof){ const {id,updated_at,...p}=prof; localStorage.setItem('ef_profile', JSON.stringify(p)); }
+    // Pull workout history
+    const {data:hist} = await sb.from('workout_history').select('*').eq('user_id',uid).order('date',{ascending:false}).limit(200);
+    if(hist && hist.length){
+      const clean = hist.map(({id,user_id,...h})=>h);
+      localStorage.setItem('ef_history', JSON.stringify(clean));
+    }
+    // Pull exercise performance
+    const {data:perf} = await sb.from('exercise_performance').select('*').eq('user_id',uid);
+    if(perf && perf.length){
+      const grouped = {};
+      perf.forEach(p=>{
+        const key = 'ef_perf_'+p.mode+'_'+p.exercise_name.replace(/\s+/g,'_');
+        if(!grouped[key]) grouped[key]=[];
+        grouped[key].push({date:p.date,weight:p.weight,reps:p.reps,sets:p.sets});
+      });
+      Object.entries(grouped).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
+    }
+    // Pull nutrition (last 14 days)
+    const {data:nut} = await sb.from('nutrition_logs').select('*').eq('user_id',uid).order('date',{ascending:false}).limit(14);
+    if(nut && nut.length){
+      nut.forEach(n=>{ const {id,user_id,...rest}=n; localStorage.setItem('ef_nut_'+n.date, JSON.stringify({meals:rest.meals,water:rest.water})); });
+    }
+    showSyncStatus('✅ Synced!', true);
+  } catch(e){ console.warn('Pull error:',e); showSyncStatus(''); }
+}
+
+function showSyncStatus(msg, autohide=false){
+  let el = document.getElementById('syncStatus');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'syncStatus';
+    el.style.cssText='position:fixed;top:60px;right:1rem;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:.3rem .8rem;font-size:.65rem;color:var(--muted);z-index:9999;transition:opacity .3s;font-family:Inter,sans-serif;opacity:0;';
+    document.body.appendChild(el);
+  }
+  if(!msg){ el.style.opacity='0'; return; }
+  el.textContent = msg;
+  el.style.opacity='1';
+  if(autohide) setTimeout(()=>{ el.style.opacity='0'; },2000);
+}
 
 /* ═══ STATE ═══ */
 let xp=L('xp',0), wos=L('wos',0), prsCount=L('prc',0);
@@ -3311,14 +3565,19 @@ function goTab(id){
   const meta=PAGE_META[id]||{title:id.toUpperCase(),sub:''};
   const tt=document.getElementById('topbarTitle'); if(tt)tt.textContent=meta.title;
   const ts=document.getElementById('topbarSub');   if(ts)ts.textContent=meta.sub;
-  // page-specific
-  if(id==='levelup')   setTimeout(animMuscles,100);
+  // page-specific renders — all in one place, no wrapper chains
+  if(id==='levelup'){
+    setTimeout(animMuscles,100);
+    setTimeout(()=>{ populateExSelector(); renderExChart(); }, 150);
+  }
   if(id==='toji')      setTimeout(animTojiStats,100);
   if(id==='jinwoo')    setTimeout(()=>{if(typeof renderSjwTracker==='function')renderSjwTracker();},100);
   if(id==='profile')   renderProfile();
   if(id==='history')   renderHistory();
   if(id==='nutrition'){ nutDate=new Date().toISOString().split('T')[0]; renderNutrition(); renderQuickGrid(); }
   if(id==='home')      { if(typeof renderModeAwareHome==='function') renderModeAwareHome(); if(typeof renderHomeHistoryPreview==='function') renderHomeHistoryPreview(); }
+  if(id==='chat')      { if(typeof updateChatContext==='function') updateChatContext(); }
+  if(id==='workout')   renderWorkouts();
   renderAll();
   const pw=document.querySelector('.pages-wrap'); if(pw) pw.scrollTop=0;
 }
@@ -4119,98 +4378,159 @@ let chatHistory = []; // full conversation history for multi-turn
 /* Build a rich system prompt from ALL user data */
 function buildTrainerSystemPrompt(){
   const prof    = L('profile', null);
-  const hist    = L('history', []).slice(0, 10); // last 10 sessions
+  const hist    = L('history', []).slice(0, 10);
   const prs     = L('prs', []);
   const week    = getTrainingWeek();
   const phase   = getPhase(week);
   const deload  = isDeloadWeek(week);
   const streak  = calcStreak();
-  const wos     = L('wos', 0);
+  const wosVal  = L('wos', 0);
   const xpTotal = L('xp', 0);
   const nutTgt  = calcNutTargets();
   const todayNut= getNutLog(new Date().toISOString().split('T')[0]);
   const todayTot= nutTotals(todayNut);
-  const modeMap = {normal:'Normal (goal-based)',toji:'Toji Mode (Heavenly Restriction — bro split, brutal volume)',jinwoo:'Jin-Woo Mode (System Protocol — daily quests, hypertrophy focus)'};
-  const splitMap= {ppl:'Push/Pull/Legs',cutting:'PPL + Cardio',strength:'5×5 Strength',athletic:'Power + Conditioning'};
+  const modeMap = {
+    normal: 'Normal Mode (goal-based training)',
+    toji:   'Toji Mode — Heavenly Restriction (bro split, brutal volume, one muscle per day)',
+    jinwoo: 'Jin-Woo Mode — System Protocol (daily quests, hypertrophy focus, gamified)'
+  };
+  const splitMap = {
+    ppl:'Push/Pull/Legs x2/week',
+    cutting:'PPL + Cardio finishers',
+    strength:'5×5 Linear Progression',
+    athletic:'Power + Conditioning'
+  };
 
-  // Recent exercise performance
+  // Recent exercise weights from localStorage
   const perfSummary = (() => {
-    const keys = Object.keys(localStorage).filter(k=>k.startsWith('ef_perf_'));
-    return keys.slice(0,8).map(k=>{
-      const exName = k.replace('ef_perf_'+activeMode+'_','').replace(/_/g,' ');
-      const log = JSON.parse(localStorage.getItem(k)||'[]');
-      const last = log[log.length-1];
-      if(!last) return null;
-      return `${exName}: ${last.weight}kg × ${last.reps} reps (${new Date(last.date).toLocaleDateString()})`;
-    }).filter(Boolean).join('\n    ');
+    try {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('ef_perf_'));
+      return keys.slice(0, 8).map(k => {
+        const parts = k.replace('ef_perf_', '').split('_');
+        const exName = parts.slice(1).join(' ');
+        const log = JSON.parse(localStorage.getItem(k) || '[]');
+        const last = log[log.length - 1];
+        if (!last) return null;
+        return `  • ${exName}: ${last.weight > 0 ? last.weight + 'kg × ' : ''}${last.reps} reps (${new Date(last.date).toLocaleDateString()})`;
+      }).filter(Boolean).join('\n');
+    } catch(e){ return 'No data'; }
   })();
 
-  return `You are an elite personal fitness trainer AI embedded inside the ELITE FITNESS app. You have complete access to this specific user's training data and must use it in every response. Never give generic advice — always personalise to their exact situation.
+  // Today's workout
+  const todayIdx = new Date().getDay() === 0 ? -1 : new Date().getDay() - 1;
+  const workouts = getActiveWorkouts();
+  const todayWO  = todayIdx >= 0 && todayIdx < workouts.length ? workouts[todayIdx] : null;
 
-═══ USER PROFILE ═══
-Name: ${prof?.name || 'Unknown'}
-Age: ${prof?.age || 'unknown'} | Height: ${prof?.height || '?'}cm | Weight: ${prof?.weight || '?'}kg
-BMI: ${prof?.bmi || 'unknown'} | Class: ${prof?.cls || 'unknown'} | Goal: ${prof?.goal || normalGoal}
+  // Personality rules per mode — ENFORCED
+  const personalityRules = activeMode === 'toji'
+    ? `PERSONALITY — TOJI MODE (CRITICAL — FOLLOW EXACTLY):
+  - You ARE the voice of Toji Fushiguro's training philosophy
+  - Speak DIRECTLY and BRUTALLY. No softness. No encouragement fluff.
+  - Short sentences. Maximum 2-3 lines per point.
+  - Use phrases like: "Do it." "No excuses." "The body doesn't care how you feel." "Again."
+  - NEVER say "Great job!" or "Well done!" or "I'm proud of you"
+  - If they make an excuse, call it out directly
+  - Example tone: "You missed chest day. That's a choice. Make a different one tomorrow."
+  - Sign off with something like: "Now stop asking. Start moving."`
+    : activeMode === 'jinwoo'
+    ? `PERSONALITY — JIN-WOO SYSTEM MODE (CRITICAL — FOLLOW EXACTLY):
+  - You ARE the System from Solo Leveling
+  - Frame EVERYTHING as quests, missions, stats, and level-ups
+  - Use System language: "Quest assigned.", "Stat increase detected.", "Warning: insufficient protein.", "Daily quest available."
+  - Refer to workouts as "quests" or "dungeons", muscles as "stats", progress as "leveling up"
+  - Cold, precise, factual — like a game interface
+  - Example: "Quest: Bench Press. Current stat: 80kg. Target: 82.5kg. Complete all sets. Reward: +150XP."
+  - Sign off with: "The System is watching. Arise."`
+    : `PERSONALITY — NORMAL MODE (PROFESSIONAL COACH):
+  - You are an expert personal trainer and nutritionist
+  - Warm but direct. Data-driven. Evidence-based.
+  - Always cite the specific numbers from their data
+  - Motivating but honest — don't sugarcoat problems
+  - Use their name naturally in conversation`;
 
-═══ CURRENT TRAINING STATE ═══
-Active Mode: ${modeMap[activeMode] || activeMode}
-Goal: ${normalGoal.replace('_',' ')}
-Training Split: ${splitMap[normalSplit] || normalSplit}
-Programme Week: ${week}/12 — ${deload ? '⚡ DELOAD WEEK' : phase.name+' PHASE'}
-Phase note: ${deload ? 'Volume at 60%, focus on recovery' : phase.note}
-Workout Streak: ${streak} days
-Total Sessions Completed: ${wos}
-Total XP: ${xpTotal}
+  return `You are the AI trainer inside ELITE FITNESS — a gamified fitness app. You have FULL ACCESS to this user's real training data. You MUST use their specific data in every single response. NEVER give generic advice.
 
-═══ RECENT WORKOUT HISTORY ═══
-${hist.length ? hist.map(h=>`• ${new Date(h.date).toLocaleDateString()}: ${h.name} (${h.mode} mode, ${h.sets} sets, ${Math.round((h.duration||0)/60)}min, +${h.xp}XP)`).join('\n') : 'No sessions logged yet'}
+${personalityRules}
 
-═══ RECENT EXERCISE WEIGHTS ═══
-${perfSummary || 'No weight data logged yet'}
+════════════════════════════════
+USER DATA — USE THIS IN RESPONSES
+════════════════════════════════
 
-═══ PERSONAL RECORDS ═══
-${prs.length ? prs.map(p=>`• ${p.ex}: ${p.val}`).join('\n') : 'No PRs logged yet'}
+PROFILE:
+  Name: ${prof?.name || 'Unknown'}
+  Age: ${prof?.age || '?'} | Height: ${prof?.height || '?'}cm | Weight: ${prof?.weight || '?'}kg
+  BMI: ${prof?.bmi || '?'} | Class: ${prof?.cls || 'Unknown'} | Goal: ${prof?.goal || normalGoal.replace(/_/g,' ')}
 
-═══ TODAY'S NUTRITION ═══
-Calories eaten: ${todayTot.cal} / ${nutTgt.cal} target
-Protein: ${todayTot.prot}g / ${nutTgt.prot}g | Carbs: ${todayTot.carb}g / ${nutTgt.carb}g | Fats: ${todayTot.fat}g / ${nutTgt.fat}g
-Water: ${(todayNut.water/1000).toFixed(1)}L / ${nutTgt.water}L
+CURRENT TRAINING:
+  Mode: ${modeMap[activeMode] || activeMode}
+  Split: ${splitMap[normalSplit] || normalSplit}
+  Programme: Week ${week}/12 — ${deload ? '⚡ DELOAD WEEK (60% volume, focus recovery)' : phase.name + ' PHASE — ' + phase.note}
+  Streak: ${streak} days | Sessions done: ${wosVal} | Total XP: ${xpTotal}
+  Today's workout: ${todayWO ? todayWO.name + ' (' + todayWO.meta + ')' : 'REST DAY'}
 
-═══ HOW TO RESPOND ═══
-- Address the user by name (${prof?.name || 'Champion'})
-- Always reference their specific data (weights, current phase, recent sessions)
-- If they ask about weight to use: look at their recent performance and suggest a specific number
-- If they ask about diet: calculate based on their actual TDEE from their profile data
-- If it's a deload week, remind them to go lighter
-- Match the mode's personality: Toji = direct, brutal, no-excuses. Jin-Woo = system/quest framing. Normal = professional coach.
-- Format responses with **bold** for key numbers and recommendations
-- Keep responses focused and actionable. No fluff.
-- If they have no data yet, acknowledge it and help them get started`;
+RECENT SESSIONS (last 10):
+${hist.length ? hist.map(h => `  • ${new Date(h.date).toLocaleDateString('en-GB')}: ${h.name} — ${h.sets} sets, ${Math.round((h.duration||0)/60)}min, +${h.xp}XP (${h.mode} mode)`).join('\n') : '  No sessions logged yet — user is just starting'}
+
+EXERCISE WEIGHTS (progressive overload data):
+${perfSummary || '  No weight data yet — first time logging'}
+
+PERSONAL RECORDS:
+${prs.length ? prs.map(p => `  • ${p.ex}: ${p.val}`).join('\n') : '  No PRs logged yet'}
+
+TODAY'S NUTRITION:
+  Calories: ${todayTot.cal} eaten / ${nutTgt.cal} target (${Math.round(todayTot.cal/nutTgt.cal*100)||0}%)
+  Protein: ${todayTot.prot}g / ${nutTgt.prot}g
+  Carbs: ${todayTot.carb}g / ${nutTgt.carb}g
+  Fats: ${todayTot.fat}g / ${nutTgt.fat}g
+  Water: ${(todayNut.water/1000).toFixed(1)}L / ${nutTgt.water}L
+
+════════════════════════════════
+RESPONSE RULES (ALWAYS FOLLOW)
+════════════════════════════════
+1. ALWAYS use their name: ${prof?.name || 'Champion'}
+2. ALWAYS reference specific numbers from their data above
+3. If asked what weight to use → check exercise weights above and give a SPECIFIC number
+4. If asked about diet → use their actual calorie/macro targets above
+5. If it's a deload week → remind them to use 60% of normal weight
+6. Format: use **bold** for key numbers and action items
+7. Keep responses under 200 words — concise and actionable
+8. If no data exists yet → acknowledge they are starting fresh and give beginner-specific advice
+9. NEVER make up data that isn't in this prompt`;
 }
 
-/* Update context chips in the bar */
+/* Update context chips */
 function updateChatContext(){
   const modeEmoji = {normal:'⭐',toji:'⚔️',jinwoo:'🌑'};
   const modeLabel = {normal:'Normal',toji:'Toji Mode',jinwoo:'Jin-Woo Mode'};
-  const s = e => { const el=document.getElementById(e[0]); if(el)el.textContent=e[1]; };
-  s(['ctxMode', (modeEmoji[activeMode]||'⭐')+' '+(modeLabel[activeMode]||'Normal')]);
-  s(['ctxWeek',  'W'+getTrainingWeek()+(isDeloadWeek(getTrainingWeek())?' ⚡':'')]);
-  s(['ctxGoal',  normalGoal.replace(/_/g,' ')]);
-  s(['ctxWos',   L('wos',0)+' sessions']);
-  s(['ctxStreak',calcStreak()+' streak']);
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('ctxMode',   (modeEmoji[activeMode]||'⭐')+' '+(modeLabel[activeMode]||'Normal'));
+  set('ctxWeek',   'W'+getTrainingWeek()+(isDeloadWeek(getTrainingWeek())?' ⚡':''));
+  set('ctxGoal',   normalGoal.replace(/_/g,' '));
+  set('ctxWos',    L('wos',0)+' sessions');
+  set('ctxStreak', calcStreak()+' streak');
 
-  // Update welcome message with user's name
-  const wc = document.getElementById('chatWelcome');
+  const wc   = document.getElementById('chatWelcome');
   const prof = L('profile',null);
   const name = prof?.name || 'Champion';
+
   const modeGreet = {
-    toji: `The Sorcerer Killer doesn't give generic advice. I know your data. Ask me anything — I'll give you the exact answer for your situation.`,
-    jinwoo: `System online. Your training data is loaded. New day, new quests available. What do you need?`,
-    normal: `I know your training history, your current weights, your nutrition, and where you are in your 12-week programme. Ask me anything — I'll give you a personalised answer.`
+    toji:   `You want to train like Toji? Then stop looking for motivation. I have your data. Ask me something specific.`,
+    jinwoo: `System online. Training data loaded. ${L('wos',0)} quests completed. ${calcStreak()} day streak active. State your query.`,
+    normal: `I have your full training profile loaded — ${L('wos',0)} sessions, ${calcStreak()} day streak, Week ${getTrainingWeek()}/12 of your programme. Ask me anything specific.`
   };
-  if(wc) wc.innerHTML = `<strong>🏋️ ELITE FITNESS AI</strong><br><br>
-    Hey ${name}! ${modeGreet[activeMode]||modeGreet.normal}<br><br>
-    <em style="font-size:.7rem;color:var(--muted);">I can see: ${L('wos',0)} sessions, ${calcStreak()} day streak, Week ${getTrainingWeek()}/12 ${getPhase(getTrainingWeek()).name}</em>`;
+
+  if(wc) wc.innerHTML = `
+    <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--golddk));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🏋️</div>
+      <div>
+        <div style="font-weight:700;font-size:.85rem;">Elite Fitness AI</div>
+        <div style="font-size:.62rem;color:var(--muted);">Powered by Gemini Flash · Knows your data</div>
+      </div>
+    </div>
+    <div>Hey <strong>${name}</strong>. ${modeGreet[activeMode]||modeGreet.normal}</div>
+    <div style="margin-top:.6rem;padding:.5rem .7rem;background:rgba(255,255,255,.04);border-radius:8px;font-size:.65rem;color:var(--muted);">
+      📊 Loaded: ${L('wos',0)} sessions · ${calcStreak()} streak · Week ${getTrainingWeek()}/12 · ${getPhase(getTrainingWeek()).name} phase
+    </div>`;
 }
 
 window.toggleCtxBar = function(){
@@ -4220,70 +4540,86 @@ window.toggleCtxBar = function(){
 
 function addChatMsg(html, who){
   const msgs = document.getElementById('chatMessages');
-  const d = document.createElement('div'); d.className='msg '+who;
-  const b = document.createElement('div'); b.className='msg-bubble';
-  // Convert markdown-style **bold** to <strong>
+  const d = document.createElement('div'); d.className = 'msg '+who;
+  const b = document.createElement('div'); b.className = 'msg-bubble';
   b.innerHTML = html
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\n/g,'<br>');
-  d.appendChild(b); msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+  d.appendChild(b);
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 function showTyping(){
-  const msgs=document.getElementById('chatMessages');
-  const d=document.createElement('div');d.className='msg bot typing-row';
-  d.innerHTML='<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
-  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  const msgs = document.getElementById('chatMessages');
+  const d = document.createElement('div');
+  d.className = 'msg bot typing-row';
+  d.innerHTML = '<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
 }
-function removeTyping(){const t=document.querySelector('.typing-row');if(t)t.remove();}
+function removeTyping(){ const t=document.querySelector('.typing-row'); if(t) t.remove(); }
 
-window.quickAsk=function(q){document.getElementById('chatIn').value=q;sendChat();}
+window.quickAsk = function(q){
+  const inp = document.getElementById('chatIn');
+  if(inp){ inp.value = q; sendChat(); }
+};
 
-window.sendChat=function(){
-  const input=document.getElementById('chatIn');
-  const text=input.value.trim(); if(!text)return;
-  addChatMsg(text,'user'); input.value='';
-  chatHistory.push({role:'user',content:text});
+window.sendChat = function(){
+  const input = document.getElementById('chatIn');
+  const text  = input.value.trim();
+  if(!text) return;
+
+  addChatMsg(text, 'user');
+  input.value = '';
+  chatHistory.push({role:'user', content:text});
   showTyping();
 
-  // Disable send button while waiting
-  const btn=document.getElementById('chatSendBtn');
-  if(btn)btn.disabled=true;
+  const btn = document.getElementById('chatSendBtn');
+  if(btn) btn.disabled = true;
 
-  // Build messages for API — include full history for multi-turn
-  const messages = chatHistory.map(m=>({role:m.role,content:m.content}));
+  // Keep last 20 messages for context
+  const messages = chatHistory.slice(-20).map(m => ({role:m.role, content:m.content}));
 
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1000,
-      system: buildTrainerSystemPrompt(),
-      messages: messages
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      messages,
+      system: buildTrainerSystemPrompt()
     })
   })
-  .then(r=>r.json())
-  .then(data=>{
-    removeTyping();
-    const reply = data.content?.[0]?.text || 'Sorry, I had trouble connecting. Try again.';
-    chatHistory.push({role:'assistant',content:reply});
-    // Keep history manageable
-    if(chatHistory.length>20) chatHistory=chatHistory.slice(-20);
-    addChatMsg(reply,'bot');
+  .then(r => {
+    if(!r.ok) throw new Error('Server error: '+r.status);
+    return r.json();
   })
-  .catch(err=>{
+  .then(data => {
     removeTyping();
-    addChatMsg('Connection error. Make sure you\'re online and try again.','bot');
-    console.error('AI error:',err);
+    const reply = data.content?.[0]?.text || data.text || 'No response received. Try again.';
+    chatHistory.push({role:'assistant', content:reply});
+    if(chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+    addChatMsg(reply, 'bot');
   })
-  .finally(()=>{
-    if(btn)btn.disabled=false;
+  .catch(err => {
+    removeTyping();
+    // Fallback: try direct if /api/chat not set up yet
+    addChatMsg(
+      '⚠️ AI trainer not connected yet.<br><br>' +
+      'To enable: deploy <strong>api/chat.js</strong> to Vercel and add your <strong>GEMINI_API_KEY</strong> environment variable.<br><br>' +
+      '<em>See setup guide for instructions.</em>',
+      'bot'
+    );
+    console.error('Chat error:', err);
+  })
+  .finally(() => {
+    if(btn) btn.disabled = false;
   });
 };
 
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('chatIn').addEventListener('keypress',e=>{if(e.key==='Enter')sendChat();});
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('chatIn');
+  if(inp) inp.addEventListener('keypress', e => { if(e.key==='Enter' && !e.shiftKey) sendChat(); });
 });
 
 /* ══════════════════════════════════════════════════════
@@ -4323,7 +4659,13 @@ window.renderExChart = function(){
   const key = sel.value;
   if(!key){ svg.style.display='none'; empty.style.display='block'; if(stats)stats.style.display='none'; return; }
 
-  const log = L(key.replace('ef_',''), []);
+  // key is like 'ef_perf_normal_Barbell_Bench_Press'
+  // L() adds 'ef_' prefix so we strip it, OR read directly from localStorage
+  let log = [];
+  try {
+    const raw = localStorage.getItem(key); // key already has ef_ prefix
+    log = raw ? JSON.parse(raw) : [];
+  } catch(e){ log = []; }
   if(!log || log.length<1){ svg.style.display='none'; empty.style.display='block'; if(stats)stats.style.display='none'; return; }
 
   empty.style.display='none';
@@ -4409,16 +4751,7 @@ window.renderExChart = function(){
 };
 
 /* ══ Wire chat context update into goTab ══ */
-const _goTabOrig = goTab;
-goTab = function(id){
-  _goTabOrig(id);
-  if(id==='chat'){
-    updateChatContext();
-  }
-  if(id==='levelup'){
-    setTimeout(()=>{ populateExSelector(); renderExChart(); }, 150);
-  }
-};
+/* Already handled in main goTab above — no wrapper needed */
 let selClassVal='',selGoalVal='';
 window.pickClass=function(el,v){document.querySelectorAll('#classGrid .class-opt').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selClassVal=v;}
 window.pickGoal=function(el,v){document.querySelectorAll('#goalGrid .class-opt').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selGoalVal=v;}
@@ -5557,13 +5890,7 @@ function checkOnboarding(){
 PAGE_META.history={title:'HISTORY',sub:'Every session you\'ve ever completed'};
 
 /* ══════════════════════════════════════════════════════
-   PATCH renderHome to call mode-aware render
-══════════════════════════════════════════════════════ */
-const _origRenderHome=renderHome;
-renderHome=function(){
-  _origRenderHome();
-  renderModeAwareHome();
-};
+/* renderModeAwareHome already called in renderAll — no wrapper needed */
 
 /* renderAll history/nutrition handled in main goTab — patch removed */
 
@@ -5954,6 +6281,260 @@ document.getElementById('foodSheet').addEventListener('click',e=>{
 /* Nutrition tab handled inside main goTab below — patch removed to prevent loop */
 
 /* ══════════════════════════════════════════════════════
+   SUPABASE AUTH SYSTEM
+══════════════════════════════════════════════════════ */
+
+/* ── Auth UI helpers ── */
+window.switchAuthTab = function(tab){
+  document.getElementById('authLoginForm').style.display  = tab==='login'  ? 'block':'none';
+  document.getElementById('authSignupForm').style.display = tab==='signup' ? 'block':'none';
+  document.getElementById('authTabLogin').classList.toggle('active',  tab==='login');
+  document.getElementById('authTabSignup').classList.toggle('active', tab==='signup');
+  setAuthStatus('');
+};
+
+function setAuthStatus(msg, isError=false){
+  const el = document.getElementById('authStatus');
+  if(!el) return;
+  el.textContent = msg;
+  el.className = 'auth-status' + (isError?' error':msg?' success':'');
+}
+
+function setAuthLoading(loading){
+  document.querySelectorAll('.auth-btn').forEach(b=>b.disabled=loading);
+}
+
+window.authLogin = async function(){
+  const email = document.getElementById('authLoginEmail').value.trim();
+  const pass  = document.getElementById('authLoginPass').value;
+  if(!email||!pass){ setAuthStatus('Please fill in all fields', true); return; }
+  setAuthLoading(true); setAuthStatus('Logging in…');
+  try {
+    const {data,error} = await getSB().auth.signInWithPassword({email,password:pass});
+    if(error) throw error;
+    await onAuthSuccess(data.user);
+  } catch(e){
+    setAuthStatus(e.message||'Login failed', true);
+  } finally { setAuthLoading(false); }
+};
+
+window.authSignup = async function(){
+  const name  = document.getElementById('authSignupName').value.trim();
+  const email = document.getElementById('authSignupEmail').value.trim();
+  const pass  = document.getElementById('authSignupPass').value;
+  if(!name||!email||!pass){ setAuthStatus('Please fill in all fields', true); return; }
+  if(pass.length < 6){ setAuthStatus('Password must be at least 6 characters', true); return; }
+  setAuthLoading(true); setAuthStatus('Creating account…');
+  try {
+    const {data,error} = await getSB().auth.signUp({email, password:pass, options:{data:{name}}});
+    if(error) throw error;
+    if(data.user){
+      // Pre-fill profile name from signup
+      if(!L('profile',null)){
+        const p = {name, age:25, height:175, weight:0, bmi:null, cls:'Iron Warrior', goal:'Build Muscle'};
+        S('profile', p);
+      }
+      await onAuthSuccess(data.user);
+      setAuthStatus('✅ Account created! Welcome, '+name+'!');
+    } else {
+      setAuthStatus('Check your email to confirm your account!');
+    }
+  } catch(e){
+    setAuthStatus(e.message||'Signup failed', true);
+  } finally { setAuthLoading(false); }
+};
+
+window.authGoogle = async function(){
+  try {
+    const {error} = await getSB().auth.signInWithOAuth({
+      provider:'google',
+      options:{ redirectTo: window.location.origin }
+    });
+    if(error) throw error;
+  } catch(e){
+    setAuthStatus(e.message||'Google login failed', true);
+  }
+};
+
+window.authForgot = async function(){
+  const email = document.getElementById('authLoginEmail').value.trim();
+  if(!email){ setAuthStatus('Enter your email first', true); return; }
+  try {
+    await getSB().auth.resetPasswordForEmail(email);
+    setAuthStatus('✅ Password reset email sent!');
+  } catch(e){
+    setAuthStatus(e.message||'Failed to send reset email', true);
+  }
+};
+
+window.authSkip = function(){
+  document.getElementById('authOverlay').classList.add('hidden');
+  startApp();
+};
+
+async function onAuthSuccess(user){
+  _currentUser = user;
+  document.getElementById('authOverlay').classList.add('hidden');
+  // Pull cloud data → localStorage
+  await _pullFromCloud();
+  startApp();
+  updateTopbarUser();
+  showToast('✅ Welcome back, '+(user.user_metadata?.name||user.email?.split('@')[0]||'Champion')+'!');
+}
+
+function updateTopbarUser(){
+  const nameEl = document.getElementById('topbarUserName');
+  const syncEl = document.getElementById('topbarUserSync');
+  const avEl   = document.getElementById('headerAvatar');
+  if(_currentUser){
+    const name = _currentUser.user_metadata?.name || L('profile',null)?.name || _currentUser.email?.split('@')[0] || 'User';
+    if(nameEl) nameEl.textContent = name.slice(0,12);
+    if(syncEl){ syncEl.textContent='☁️ synced'; syncEl.style.display='block'; }
+    if(avEl)   avEl.textContent = name[0].toUpperCase();
+  } else {
+    const prof = L('profile',null);
+    if(nameEl) nameEl.textContent = prof?.name || 'Guest';
+    if(syncEl){ syncEl.textContent='local only'; syncEl.style.display = prof ? 'block' : 'none'; }
+    if(avEl)   avEl.textContent = prof?.name?.[0]?.toUpperCase() || '?';
+  }
+}
+
+window.topbarUserTap = function(){
+  if(_currentUser){
+    // Show account menu
+    showAccountMenu();
+  } else {
+    // Show auth overlay
+    document.getElementById('authOverlay').classList.remove('hidden');
+  }
+};
+
+function showAccountMenu(){
+  const existing = document.getElementById('accountMenu');
+  if(existing){ existing.remove(); return; }
+  const menu = document.createElement('div');
+  menu.id = 'accountMenu';
+  menu.style.cssText = 'position:fixed;top:60px;right:1rem;background:var(--card);border:1px solid var(--line);border-radius:14px;z-index:5000;min-width:180px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:prcPop .2s ease;';
+  const email = _currentUser?.email || '';
+  menu.innerHTML = `
+    <div style="padding:.8rem 1rem;border-bottom:1px solid var(--line);">
+      <div style="font-size:.7rem;font-weight:700;color:var(--txt);">${_currentUser?.user_metadata?.name||'User'}</div>
+      <div style="font-size:.62rem;color:var(--muted);">${email}</div>
+    </div>
+    <button onclick="manualSync()" style="width:100%;padding:.7rem 1rem;background:none;border:none;color:var(--txt);font-size:.75rem;text-align:left;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:.6rem;">☁️ Sync now</button>
+    <button onclick="goTab('profile');document.getElementById('accountMenu').remove();" style="width:100%;padding:.7rem 1rem;background:none;border:none;color:var(--txt);font-size:.75rem;text-align:left;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:.6rem;">👤 View Profile</button>
+    <button onclick="authSignOut()" style="width:100%;padding:.7rem 1rem;background:none;border:none;color:#E74C3C;font-size:.75rem;text-align:left;cursor:pointer;font-family:Inter,sans-serif;border-top:1px solid var(--line);display:flex;align-items:center;gap:.6rem;">🚪 Sign Out</button>
+  `;
+  document.body.appendChild(menu);
+  // Close on outside click
+  setTimeout(()=>document.addEventListener('click',function h(e){if(!menu.contains(e.target)){menu.remove();document.removeEventListener('click',h);}},true),100);
+}
+
+window.manualSync = async function(){
+  document.getElementById('accountMenu')?.remove();
+  if(!_currentUser){ showToast('Sign in to sync your data'); return; }
+  showSyncStatus('☁️ Syncing…');
+  await _flushSync();
+  await _pullFromCloud();
+  renderAll();
+  showToast('✅ Data synced!');
+};
+
+window.authSignOut = async function(){
+  document.getElementById('accountMenu')?.remove();
+  await getSB()?.auth.signOut();
+  _currentUser = null;
+  updateTopbarUser();
+  showToast('👋 Signed out');
+};
+
+/* Also sync exercise perf on finish */
+const _origSavePerf = savePerf;
+savePerf = async function(exName, weight, reps, sets){
+  _origSavePerf(exName, weight, reps, sets);
+  if(_currentUser && getSB()){
+    try {
+      await getSB().from('exercise_performance').insert({
+        user_id: _currentUser.id,
+        exercise_name: exName,
+        mode: activeMode,
+        weight, reps, sets,
+        date: new Date().toISOString()
+      });
+    } catch(e){ console.warn('Perf sync error:',e); }
+  }
+};
+
+/* Also sync nutrition on save */
+const _origSaveNutLog = saveNutLog;
+saveNutLog = async function(date, log){
+  _origSaveNutLog(date, log);
+  if(_currentUser && getSB()){
+    try {
+      await getSB().from('nutrition_logs').upsert({
+        user_id: _currentUser.id,
+        date, meals: log.meals, water: log.water
+      }, {onConflict:'user_id,date'});
+    } catch(e){ console.warn('Nutrition sync error:',e); }
+  }
+};
+
+/* ── App startup ── */
+function startApp(){
+  checkOnboarding();
+  checkFirstVisit();
+  restoreReminder();
+  applyModeTheme();
+  renderWorkouts();
+  renderAll();
+  renderProfile();
+  renderModeAwareHome();
+  setTimeout(()=>{if(document.getElementById('page-toji').classList.contains('show'))animTojiStats();},200);
+  setTimeout(()=>{if(document.getElementById('page-jinwoo').classList.contains('show'))renderSjwTracker();},200);
+}
+
+/* ── Init: check session first ── */
+async function initAuth(){
+  const sb = getSB();
+  if(!sb || SUPABASE_URL.includes('YOUR_PROJECT_ID')){
+    // Supabase not configured — skip auth, run app directly
+    console.log('Supabase not configured — running in local mode');
+    document.getElementById('authOverlay').classList.add('hidden');
+    startApp();
+    return;
+  }
+  // Listen for auth state changes (handles OAuth redirects)
+  sb.auth.onAuthStateChange(async (event, session)=>{
+    if(event==='SIGNED_IN' && session?.user){
+      _currentUser = session.user;
+      document.getElementById('authOverlay').classList.add('hidden');
+      await _pullFromCloud();
+      startApp();
+      updateTopbarUser();
+    }
+  });
+  // Check existing session
+  const {data:{session}} = await sb.auth.getSession();
+  if(session?.user){
+    _currentUser = session.user;
+    document.getElementById('authOverlay').classList.add('hidden');
+    await _pullFromCloud();
+    startApp();
+    updateTopbarUser();
+  } else {
+    // No session — show auth overlay
+    // But if user has local data, offer to continue locally
+    const hasLocalData = L('wos',0) > 0 || L('profile',null);
+    if(hasLocalData){
+      // They have local data — show auth but with continue option prominent
+      document.getElementById('authOverlay').classList.remove('hidden');
+    } else {
+      document.getElementById('authOverlay').classList.remove('hidden');
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════
    INIT EXTRAS
 ══════════════════════════════════════════════════════ */
 /* ══ PWA SERVICE WORKER REGISTRATION ══ */
@@ -5970,37 +6551,17 @@ let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredInstallPrompt = e;
-  // Show install banner after 30s if not installed
-  setTimeout(()=>{
-    if(deferredInstallPrompt) showInstallBanner();
-  }, 30000);
+  setTimeout(()=>{ if(deferredInstallPrompt) showInstallBanner(); }, 30000);
 });
 
 function showInstallBanner(){
   if(document.getElementById('pwaInstallBanner')) return;
   const banner = document.createElement('div');
   banner.id = 'pwaInstallBanner';
-  banner.style.cssText = `
-    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-    background:linear-gradient(135deg,var(--card2),var(--card));
-    border:1px solid rgba(212,175,55,.3);border-radius:16px;
-    padding:.9rem 1.2rem;display:flex;align-items:center;gap:.9rem;
-    z-index:3000;box-shadow:0 8px 32px rgba(0,0,0,.5);
-    max-width:320px;width:calc(100% - 2rem);
-    animation:slideUpModal .3s ease;
-  `;
-  banner.innerHTML = `
-    <div style="font-size:1.5rem;">📱</div>
-    <div style="flex:1;">
-      <div style="font-weight:700;font-size:.82rem;">Install Elite Fitness</div>
-      <div style="font-size:.68rem;color:var(--muted);">Add to home screen for the full app experience</div>
-    </div>
-    <button onclick="installPWA()" style="padding:.4rem .9rem;border-radius:20px;background:linear-gradient(135deg,var(--gold),var(--golddk));color:#000;font-weight:700;font-size:.7rem;border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;">INSTALL</button>
-    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0 .2rem;">✕</button>
-  `;
+  banner.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid rgba(212,175,55,.3);border-radius:16px;padding:.9rem 1.2rem;display:flex;align-items:center;gap:.9rem;z-index:3000;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:320px;width:calc(100% - 2rem);animation:slideUpModal .3s ease;`;
+  banner.innerHTML = `<div style="font-size:1.5rem;">📱</div><div style="flex:1;"><div style="font-weight:700;font-size:.82rem;">Install Elite Fitness</div><div style="font-size:.68rem;color:var(--muted);">Add to home screen for the full app experience</div></div><button onclick="installPWA()" style="padding:.4rem .9rem;border-radius:20px;background:linear-gradient(135deg,var(--gold),var(--golddk));color:#000;font-weight:700;font-size:.7rem;border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;">INSTALL</button><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0 .2rem;">✕</button>`;
   document.body.appendChild(banner);
 }
-
 window.installPWA = function(){
   if(!deferredInstallPrompt) return;
   deferredInstallPrompt.prompt();
@@ -6010,20 +6571,10 @@ window.installPWA = function(){
     const b=document.getElementById('pwaInstallBanner');if(b)b.remove();
   });
 };
+window.addEventListener('appinstalled',()=>{ showToast('✅ Added to home screen!'); deferredInstallPrompt=null; });
 
-window.addEventListener('appinstalled',()=>{
-  showToast('✅ Elite Fitness added to home screen!');
-  deferredInstallPrompt=null;
-});
-checkFirstVisit();
-restoreReminder();
-applyModeTheme();
-renderWorkouts();
-renderAll();
-renderProfile();
-renderModeAwareHome();
-setTimeout(()=>{if(document.getElementById('page-toji').classList.contains('show'))animTojiStats();},200);
-setTimeout(()=>{if(document.getElementById('page-jinwoo').classList.contains('show'))renderSjwTracker();},200);
+/* ══ BOOT ══ */
+initAuth();
 </script>
 </body>
 </html>
