@@ -3265,23 +3265,19 @@ async function _pullFromCloud(){
   const uid = _currentUser.id;
   const sb  = getSB();
   try {
-    showSyncStatus('☁️ Syncing your data…');
-    // Pull progress
+    showSyncStatus('☁️ Syncing…');
     const {data:prog} = await sb.from('user_progress').select('*').eq('user_id',uid).single();
     if(prog){
       const keys=['xp','wos','streak','mxp','prs','prc','txp','sxp','activeMode','normalGoal','normalSplit'];
       keys.forEach(k=>{ if(prog[k]!==undefined) localStorage.setItem('ef_'+k, JSON.stringify(prog[k])); });
     }
-    // Pull profile
     const {data:prof} = await sb.from('profiles').select('*').eq('id',uid).single();
     if(prof){ const {id,updated_at,...p}=prof; localStorage.setItem('ef_profile', JSON.stringify(p)); }
-    // Pull workout history
     const {data:hist} = await sb.from('workout_history').select('*').eq('user_id',uid).order('date',{ascending:false}).limit(200);
     if(hist && hist.length){
       const clean = hist.map(({id,user_id,...h})=>h);
       localStorage.setItem('ef_history', JSON.stringify(clean));
     }
-    // Pull exercise performance
     const {data:perf} = await sb.from('exercise_performance').select('*').eq('user_id',uid);
     if(perf && perf.length){
       const grouped = {};
@@ -3292,13 +3288,15 @@ async function _pullFromCloud(){
       });
       Object.entries(grouped).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
     }
-    // Pull nutrition (last 14 days)
     const {data:nut} = await sb.from('nutrition_logs').select('*').eq('user_id',uid).order('date',{ascending:false}).limit(14);
     if(nut && nut.length){
       nut.forEach(n=>{ const {id,user_id,...rest}=n; localStorage.setItem('ef_nut_'+n.date, JSON.stringify({meals:rest.meals,water:rest.water})); });
     }
     showSyncStatus('✅ Synced!', true);
-  } catch(e){ console.warn('Pull error:',e); showSyncStatus(''); }
+  } catch(e){
+    console.warn('Pull error:',e);
+    showSyncStatus(''); // always hide on error
+  }
 }
 
 function showSyncStatus(msg, autohide=false){
@@ -6375,11 +6373,10 @@ window.authSkip = function(){
 async function onAuthSuccess(user){
   _currentUser = user;
   document.getElementById('authOverlay').classList.add('hidden');
-  // Pull cloud data → localStorage
+  resetAppStarted();
   await _pullFromCloud();
   startApp();
   updateTopbarUser();
-  showToast('✅ Welcome back, '+(user.user_metadata?.name||user.email?.split('@')[0]||'Champion')+'!');
 }
 
 function updateTopbarUser(){
@@ -6480,8 +6477,19 @@ saveNutLog = async function(date, log){
 };
 
 /* ── App startup ── */
+let _appStarted = false; // prevent double-start
 function startApp(){
-  checkOnboarding();
+  if(_appStarted) return;
+  _appStarted = true;
+  // If user is logged in — never show onboarding again
+  if(_currentUser){
+    // Mark as onboarded so overlay never shows
+    if(!L('onboarded',null)) S('onboarded','skip');
+    const ob = document.getElementById('onboardOverlay');
+    if(ob) ob.classList.add('done');
+  } else {
+    checkOnboarding();
+  }
   checkFirstVisit();
   restoreReminder();
   applyModeTheme();
@@ -6489,49 +6497,55 @@ function startApp(){
   renderAll();
   renderProfile();
   renderModeAwareHome();
-  setTimeout(()=>{if(document.getElementById('page-toji').classList.contains('show'))animTojiStats();},200);
-  setTimeout(()=>{if(document.getElementById('page-jinwoo').classList.contains('show'))renderSjwTracker();},200);
+  goTab('home'); // always land on home after login
 }
+
+function resetAppStarted(){ _appStarted = false; } // call before re-init
 
 /* ── Init: check session first ── */
 async function initAuth(){
   const sb = getSB();
   if(!sb || SUPABASE_URL.includes('YOUR_PROJECT_ID')){
-    // Supabase not configured — skip auth, run app directly
     console.log('Supabase not configured — running in local mode');
     document.getElementById('authOverlay').classList.add('hidden');
     startApp();
     return;
   }
-  // Listen for auth state changes (handles OAuth redirects)
-  sb.auth.onAuthStateChange(async (event, session)=>{
-    if(event==='SIGNED_IN' && session?.user){
+
+  // Check existing session FIRST
+  try {
+    const {data:{session}} = await sb.auth.getSession();
+    if(session?.user){
       _currentUser = session.user;
       document.getElementById('authOverlay').classList.add('hidden');
       await _pullFromCloud();
       startApp();
       updateTopbarUser();
+      return; // don't set up listener if already handled
+    }
+  } catch(e){ console.warn('Session check error:',e); }
+
+  // No existing session — show auth overlay
+  document.getElementById('authOverlay').classList.remove('hidden');
+
+  // Listen for future auth state changes (login, OAuth redirect)
+  sb.auth.onAuthStateChange(async (event, session)=>{
+    if(event==='SIGNED_IN' && session?.user && !_currentUser){
+      _currentUser = session.user;
+      document.getElementById('authOverlay').classList.add('hidden');
+      resetAppStarted();
+      await _pullFromCloud();
+      startApp();
+      updateTopbarUser();
+      showToast('✅ Welcome, '+(session.user.user_metadata?.name||session.user.email?.split('@')[0]||'Champion')+'!');
+    }
+    if(event==='SIGNED_OUT'){
+      _currentUser = null;
+      _appStarted = false;
+      updateTopbarUser();
+      document.getElementById('authOverlay').classList.remove('hidden');
     }
   });
-  // Check existing session
-  const {data:{session}} = await sb.auth.getSession();
-  if(session?.user){
-    _currentUser = session.user;
-    document.getElementById('authOverlay').classList.add('hidden');
-    await _pullFromCloud();
-    startApp();
-    updateTopbarUser();
-  } else {
-    // No session — show auth overlay
-    // But if user has local data, offer to continue locally
-    const hasLocalData = L('wos',0) > 0 || L('profile',null);
-    if(hasLocalData){
-      // They have local data — show auth but with continue option prominent
-      document.getElementById('authOverlay').classList.remove('hidden');
-    } else {
-      document.getElementById('authOverlay').classList.remove('hidden');
-    }
-  }
 }
 
 /* ══════════════════════════════════════════════════════
