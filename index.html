@@ -6308,11 +6308,22 @@ window.authLogin = async function(){
   if(!email||!pass){ setAuthStatus('Please fill in all fields', true); return; }
   setAuthLoading(true); setAuthStatus('Logging in…');
   try {
-    const {data,error} = await getSB().auth.signInWithPassword({email,password:pass});
+    const sb = getSB();
+    if(!sb){ setAuthStatus('Database not configured. Use "local only" below.', true); setAuthLoading(false); return; }
+    const {data,error} = await sb.auth.signInWithPassword({email,password:pass});
     if(error) throw error;
     await onAuthSuccess(data.user);
   } catch(e){
-    setAuthStatus(e.message||'Login failed', true);
+    const msg = e.message||'';
+    if(msg.includes('Invalid API key') || msg.includes('invalid_api_key')){
+      setAuthStatus('⚠️ Database key invalid. Update SUPABASE_KEY in index.html — or use "local only" below.', true);
+    } else if(msg.includes('Invalid login credentials')){
+      setAuthStatus('Wrong email or password. Try again.', true);
+    } else if(msg.includes('Email not confirmed')){
+      setAuthStatus('Check your email and confirm your account first.', true);
+    } else {
+      setAuthStatus(msg||'Login failed. Try again.', true);
+    }
   } finally { setAuthLoading(false); }
 };
 
@@ -6324,21 +6335,30 @@ window.authSignup = async function(){
   if(pass.length < 6){ setAuthStatus('Password must be at least 6 characters', true); return; }
   setAuthLoading(true); setAuthStatus('Creating account…');
   try {
-    const {data,error} = await getSB().auth.signUp({email, password:pass, options:{data:{name}}});
+    const sb = getSB();
+    if(!sb){ setAuthStatus('Database not configured. Use "local only" option below.', true); setAuthLoading(false); return; }
+    const {data,error} = await sb.auth.signUp({email, password:pass, options:{data:{name}}});
     if(error) throw error;
     if(data.user){
-      // Pre-fill profile name from signup
       if(!L('profile',null)){
         const p = {name, age:25, height:175, weight:0, bmi:null, cls:'Iron Warrior', goal:'Build Muscle'};
         S('profile', p);
       }
       await onAuthSuccess(data.user);
-      setAuthStatus('✅ Account created! Welcome, '+name+'!');
     } else {
-      setAuthStatus('Check your email to confirm your account!');
+      setAuthStatus('✅ Check your email to confirm your account, then login!');
     }
   } catch(e){
-    setAuthStatus(e.message||'Signup failed', true);
+    const msg = e.message||'';
+    if(msg.includes('Invalid API key') || msg.includes('invalid_api_key')){
+      setAuthStatus('⚠️ Database key invalid. Please update SUPABASE_KEY in index.html — or use "local only" below.', true);
+    } else if(msg.includes('already registered')){
+      setAuthStatus('This email is already registered. Please login instead.', true);
+    } else if(msg.includes('Invalid email')){
+      setAuthStatus('Please enter a valid email address.', true);
+    } else {
+      setAuthStatus(msg||'Signup failed. Try again.', true);
+    }
   } finally { setAuthLoading(false); }
 };
 
