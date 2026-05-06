@@ -3195,7 +3195,7 @@ body.mode-jinwoo .ccb-chip{background:rgba(107,99,255,.1);border-color:rgba(107,
    https://supabase.com → Project Settings → API
 ══════════════════════════════════════════════════════ */
 const SUPABASE_URL = 'https://cicfcpsptaxmrsjhpved.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpY2ZjcHNwdGF4bXJzamhwdmVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3OTU3MDAsImV4cCI6MjA5MzM3MTcwMH0.eriSyDWVzqHcd7LYZY1H5HenrSDv782lNNl-eMEIrEA';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpY2ZjcHNwdGF4bXJzamhwdmVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyNzY1NTQsImV4cCI6MjA2MTg1MjU1NH0.placeholder_replace_with_real_key';
 let _sb = null; // supabase client, initialized after SDK loads
 let _currentUser = null; // logged-in user
 let _syncQueue = []; // offline queue
@@ -6454,14 +6454,19 @@ window.manualSync = async function(){
   await _flushSync();
   await _pullFromCloud();
   renderAll();
+  renderModeAwareHome();
   showToast('✅ Data synced!');
 };
 
 window.authSignOut = async function(){
   document.getElementById('accountMenu')?.remove();
-  await getSB()?.auth.signOut();
+  try { await getSB()?.auth.signOut(); } catch(e){}
   _currentUser = null;
+  _appStarted  = false;
   updateTopbarUser();
+  showSyncStatus('');
+  const authOv = document.getElementById('authOverlay');
+  if(authOv) authOv.classList.remove('hidden');
   showToast('👋 Signed out');
 };
 
@@ -6496,20 +6501,115 @@ saveNutLog = async function(date, log){
   }
 };
 
-/* ── App startup ── */
-let _appStarted = false; // prevent double-start
+/* ══════════════════════════════════════════════════════
+   AUTH & SYNC — CLEAN REWRITE
+   Fixes: double start, sync loop, onboarding on login,
+   sync badge stuck, session restore on page refresh
+══════════════════════════════════════════════════════ */
+
+let _appStarted    = false;
+let _syncInProgress= false;
+
+/* ── Pull all data from Supabase into localStorage ── */
+async function _pullFromCloud(){
+  if(!_currentUser || !getSB() || _syncInProgress) return;
+  _syncInProgress = true;
+  const uid = _currentUser.id;
+  const sb  = getSB();
+  showSyncStatus('☁️ Syncing…');
+  try {
+    // Progress
+    const {data:prog} = await sb.from('user_progress').select('*').eq('user_id',uid).maybeSingle();
+    if(prog){
+      ['xp','wos','streak','mxp','prs','prc','txp','sxp','activeMode','normalGoal','normalSplit']
+        .forEach(k=>{ if(prog[k]!==undefined) localStorage.setItem('ef_'+k, JSON.stringify(prog[k])); });
+    }
+    // Profile
+    const {data:prof} = await sb.from('profiles').select('*').eq('id',uid).maybeSingle();
+    if(prof){ const {id,updated_at,...p}=prof; localStorage.setItem('ef_profile', JSON.stringify(p)); }
+    // History
+    const {data:hist} = await sb.from('workout_history').select('*').eq('user_id',uid).order('date',{ascending:false}).limit(200);
+    if(hist?.length){
+      localStorage.setItem('ef_history', JSON.stringify(hist.map(({id,user_id,...h})=>h)));
+    }
+    // Exercise performance
+    const {data:perf} = await sb.from('exercise_performance').select('*').eq('user_id',uid);
+    if(perf?.length){
+      const grouped={};
+      perf.forEach(p=>{
+        const key='ef_perf_'+p.mode+'_'+p.exercise_name.replace(/\s+/g,'_');
+        if(!grouped[key]) grouped[key]=[];
+        grouped[key].push({date:p.date,weight:p.weight,reps:p.reps,sets:p.sets});
+      });
+      Object.entries(grouped).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
+    }
+    // Nutrition
+    const {data:nut} = await sb.from('nutrition_logs').select('*').eq('user_id',uid).order('date',{ascending:false}).limit(14);
+    if(nut?.length){
+      nut.forEach(n=>{
+        const {id,user_id,...rest}=n;
+        localStorage.setItem('ef_nut_'+n.date, JSON.stringify({meals:rest.meals,water:rest.water}));
+      });
+    }
+    showSyncStatus('✅ Synced!', true);
+  } catch(e){
+    console.warn('Sync error:',e);
+    showSyncStatus('');
+  } finally {
+    _syncInProgress = false;
+  }
+}
+
+/* ── Flush local changes to Supabase ── */
+function _queueSync(k,v){
+  _syncQueue.push({k,v});
+  clearTimeout(_syncTimeout);
+  _syncTimeout = setTimeout(_flushSync, 2000);
+}
+
+async function _flushSync(){
+  if(!_currentUser || !getSB() || !_syncQueue.length) return;
+  const uid = _currentUser.id;
+  const sb  = getSB();
+  const q   = [..._syncQueue];
+  _syncQueue = [];
+  try {
+    const prog={};
+    q.forEach(({k,v})=>{ prog[k]=v; });
+    const progKeys=['xp','wos','streak','mxp','prs','prc','txp','sxp','activeMode','normalGoal','normalSplit'];
+    const progData={user_id:uid,updated_at:new Date().toISOString()};
+    progKeys.forEach(k=>{ if(prog[k]!==undefined) progData[k]=prog[k]; });
+    if(Object.keys(progData).length>2){
+      await sb.from('user_progress').upsert(progData,{onConflict:'user_id'});
+    }
+    if(prog.profile){
+      await sb.from('profiles').upsert({id:uid,...prog.profile,updated_at:new Date().toISOString()});
+    }
+    if(prog.history?.length){
+      const rows=prog.history.slice(0,5).map(h=>({user_id:uid,...h,date:h.date||new Date().toISOString()}));
+      await sb.from('workout_history').upsert(rows,{onConflict:'user_id,date'});
+    }
+  } catch(e){ console.warn('Flush error:',e); }
+}
+
+/* ── Start the app ── */
 function startApp(){
   if(_appStarted) return;
   _appStarted = true;
-  // If user is logged in — never show onboarding again
+
+  // Hide auth overlay always
+  const authOv = document.getElementById('authOverlay');
+  if(authOv) authOv.classList.add('hidden');
+
+  // Logged-in users NEVER see onboarding
   if(_currentUser){
-    // Mark as onboarded so overlay never shows
-    if(!L('onboarded',null)) S('onboarded','skip');
+    S('onboarded','yes');
     const ob = document.getElementById('onboardOverlay');
     if(ob) ob.classList.add('done');
   } else {
     checkOnboarding();
   }
+
   checkFirstVisit();
   restoreReminder();
   applyModeTheme();
@@ -6517,55 +6617,84 @@ function startApp(){
   renderAll();
   renderProfile();
   renderModeAwareHome();
-  goTab('home'); // always land on home after login
+  goTab('home');
 }
 
-function resetAppStarted(){ _appStarted = false; } // call before re-init
+function resetAppStarted(){ _appStarted = false; }
 
-/* ── Init: check session first ── */
+/* ── Main auth initialiser ── */
 async function initAuth(){
   const sb = getSB();
+
+  // No Supabase configured → run in local mode immediately
   if(!sb || SUPABASE_URL.includes('YOUR_PROJECT_ID')){
-    console.log('Supabase not configured — running in local mode');
-    document.getElementById('authOverlay').classList.add('hidden');
+    const authOv = document.getElementById('authOverlay');
+    if(authOv) authOv.classList.add('hidden');
     startApp();
     return;
   }
 
-  // Check existing session FIRST
-  try {
-    const {data:{session}} = await sb.auth.getSession();
-    if(session?.user){
-      _currentUser = session.user;
-      document.getElementById('authOverlay').classList.add('hidden');
-      await _pullFromCloud();
-      startApp();
-      updateTopbarUser();
-      return; // don't set up listener if already handled
-    }
-  } catch(e){ console.warn('Session check error:',e); }
+  // ── ALWAYS set up auth listener first (handles token refresh, sign-in, sign-out) ──
+  sb.auth.onAuthStateChange(async(event, session)=>{
+    console.log('Auth event:', event);
 
-  // No existing session — show auth overlay
-  document.getElementById('authOverlay').classList.remove('hidden');
+    if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION'){
+      if(session?.user){
+        const isNewLogin = !_currentUser || _currentUser.id !== session.user.id;
+        _currentUser = session.user;
+        const authOv = document.getElementById('authOverlay');
+        if(authOv) authOv.classList.add('hidden');
 
-  // Listen for future auth state changes (login, OAuth redirect)
-  sb.auth.onAuthStateChange(async (event, session)=>{
-    if(event==='SIGNED_IN' && session?.user && !_currentUser){
-      _currentUser = session.user;
-      document.getElementById('authOverlay').classList.add('hidden');
-      resetAppStarted();
-      await _pullFromCloud();
-      startApp();
-      updateTopbarUser();
-      showToast('✅ Welcome, '+(session.user.user_metadata?.name||session.user.email?.split('@')[0]||'Champion')+'!');
+        if(isNewLogin){
+          resetAppStarted();
+          startApp();
+          updateTopbarUser();
+          if(event === 'SIGNED_IN'){
+            showToast('✅ Welcome, '+(session.user.user_metadata?.name||session.user.email?.split('@')[0]||'Champion')+'!');
+          }
+          // Sync in background
+          _pullFromCloud().then(()=>{ renderAll(); renderModeAwareHome(); }).catch(e=>console.warn('Sync error:',e));
+        }
+      }
     }
-    if(event==='SIGNED_OUT'){
+
+    if(event === 'SIGNED_OUT'){
       _currentUser = null;
-      _appStarted = false;
+      _appStarted  = false;
       updateTopbarUser();
-      document.getElementById('authOverlay').classList.remove('hidden');
+      showSyncStatus('');
+      setAuthStatus('');
+      const authOv = document.getElementById('authOverlay');
+      if(authOv) authOv.classList.remove('hidden');
     }
   });
+
+  // ── Check existing session ──
+  try {
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session?.user){
+      // Already logged in — start app with local data immediately
+      _currentUser = session.user;
+      const authOv = document.getElementById('authOverlay');
+      if(authOv) authOv.classList.add('hidden');
+      startApp();
+      updateTopbarUser();
+      // Sync cloud data in background (don't block)
+      _pullFromCloud()
+        .then(()=>{ renderAll(); renderModeAwareHome(); })
+        .catch(e=>console.warn('Background sync error:',e));
+    } else {
+      // No session → show auth screen
+      setAuthStatus('');
+      const authOv = document.getElementById('authOverlay');
+      if(authOv) authOv.classList.remove('hidden');
+    }
+  } catch(e){
+    console.warn('getSession error:',e);
+    setAuthStatus('');
+    const authOv = document.getElementById('authOverlay');
+    if(authOv) authOv.classList.remove('hidden');
+  }
 }
 
 /* ══════════════════════════════════════════════════════
