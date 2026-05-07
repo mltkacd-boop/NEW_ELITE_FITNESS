@@ -6374,19 +6374,18 @@ function updateTopbarUser(){
   const nameEl = document.getElementById('topbarUserName');
   const syncEl = document.getElementById('topbarUserSync');
   const avEl   = document.getElementById('headerAvatar');
-  if(_currentUser){
+  if(_currentUser && !_currentUser._provisional){
     const name = _currentUser.user_metadata?.name || L('profile',null)?.name || _currentUser.email?.split('@')[0] || 'User';
     if(nameEl) nameEl.textContent = name.slice(0,12);
-    if(syncEl){ syncEl.textContent='☁️ synced'; syncEl.style.display='block'; }
-    if(avEl)   avEl.textContent = name[0].toUpperCase();
+    if(syncEl){ syncEl.textContent='☁️'; syncEl.style.display='inline'; }
+    if(avEl && name) avEl.textContent = name[0].toUpperCase();
   } else {
     const prof = L('profile',null);
     if(nameEl) nameEl.textContent = prof?.name || 'Guest';
-    if(syncEl){ syncEl.textContent='local only'; syncEl.style.display = prof ? 'block' : 'none'; }
+    if(syncEl) syncEl.style.display = 'none';
     if(avEl)   avEl.textContent = prof?.name?.[0]?.toUpperCase() || '?';
   }
 }
-
 window.topbarUserTap = function(){
   if(_currentUser){
     // Show account menu
@@ -6431,14 +6430,27 @@ window.manualSync = async function(){
 
 window.authSignOut = async function(){
   document.getElementById('accountMenu')?.remove();
-  try { await getSB()?.auth.signOut(); } catch(e){}
+  // Sign out from Supabase
+  try { await getSB()?.auth.signOut(); } catch(e){ console.warn('Signout error:', e); }
+  // Clear all local state immediately — don't wait for SIGNED_OUT event
   _currentUser = null;
   _appStarted  = false;
+  _sb = null; // force new client on next login so listener is fresh
+  if(window._reminderInterval){ clearInterval(window._reminderInterval); window._reminderInterval = null; }
+  if(typeof chatHistory !== 'undefined') chatHistory = [];
+  // Clear sensitive localStorage keys
+  ['xp','wos','streak','mxp','prs','prc','history','profile','activeMode',
+   'normalGoal','normalSplit','txp','sxp','onboarded','modeChosen'].forEach(k=>{
+    localStorage.removeItem('ef_'+k);
+  });
   updateTopbarUser();
   showSyncStatus('');
+  showToast('👋 Signed out');
+  // Show auth screen
   const authOv = document.getElementById('authOverlay');
   if(authOv) authOv.classList.remove('hidden');
-  showToast('👋 Signed out');
+  // Re-init so fresh listener is registered for next login
+  setTimeout(()=> initAuth(), 100);
 };
 
 /* Also sync exercise perf on finish */
