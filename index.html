@@ -6600,97 +6600,63 @@ async function initAuth(){
   const sb = getSB();
 
   // ── Supabase not configured → local mode ──
-  if(!sb || SUPABASE_URL.includes('YOUR_PROJECT_ID')){
+  if(!sb || SUPABASE_URL.includes('YOUR_PROJECT_ID') || SUPABASE_KEY.includes('YOUR_ANON')){
     document.getElementById('authOverlay').classList.add('hidden');
     startApp();
     return;
   }
 
-  // ── Step 1: Check for saved session in localStorage first (instant) ──
-  // This prevents the onboarding flash on PWA reload
-  const savedUser = L('_savedUserId', null);
-  if(savedUser){
-    // Temporarily mark as logged in so startApp() skips onboarding
-    // Real user object arrives from getSession() below — this is just a guard
-    _currentUser = { id: savedUser, _provisional: true };
-    document.getElementById('authOverlay').classList.add('hidden');
-    startApp();
+  // ── Step 1: Check real session from Supabase (uses persistSession storage) ──
+  // This is instant if the token is cached in localStorage under ef_sb_auth
+  try {
+    const { data:{ session } } = await sb.auth.getSession();
+
+    if(session?.user){
+      // Valid session found — go straight to app, no onboarding, no login screen
+      _currentUser = session.user;
+      document.getElementById('authOverlay').classList.add('hidden');
+      await _pullFromCloud();
+      startApp();
+      updateTopbarUser();
+    } else {
+      // No session — show login
+      document.getElementById('authOverlay').classList.remove('hidden');
+    }
+  } catch(e){
+    console.warn('getSession error:', e);
+    // On network error — show login rather than broken state
+    document.getElementById('authOverlay').classList.remove('hidden');
   }
 
-  // ── Step 2: Set up auth state listener (handles everything going forward) ──
+  // ── Step 2: Listen for future auth changes (login, logout, token refresh) ──
   sb.auth.onAuthStateChange(async(event, session)=>{
-    if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
+    if(event === 'SIGNED_IN'){
       if(!session?.user) return;
-      const wasLoggedIn = !!_currentUser && !_currentUser._provisional;
-      _currentUser = session.user; // always replace with real object
-      S('_savedUserId', session.user.id); // save for next load
-
+      _currentUser = session.user;
       document.getElementById('authOverlay').classList.add('hidden');
+      resetAppStarted();
+      await _pullFromCloud();
+      startApp();
+      updateTopbarUser();
+      showToast('✅ Welcome, '+(session.user.user_metadata?.name||session.user.email?.split('@')[0]||'Champion')+'!');
+    }
 
-      if(!wasLoggedIn || !_appStarted){
-        // Pull cloud data FIRST so startApp renders with real data
-        await _pullFromCloud();
-        resetAppStarted();
-        startApp();
-        updateTopbarUser();
-        if(event === 'SIGNED_IN'){
-          showToast('✅ Welcome, '+(session.user.user_metadata?.name||session.user.email?.split('@')[0]||'Champion')+'!');
-        }
-      } else {
-        updateTopbarUser();
-      }
+    if(event === 'TOKEN_REFRESHED'){
+      if(session?.user) _currentUser = session.user;
+      updateTopbarUser();
     }
 
     if(event === 'SIGNED_OUT'){
       _currentUser = null;
       _appStarted  = false;
-      S('_savedUserId', null); // clear saved session
+      if(window._reminderInterval){ clearInterval(window._reminderInterval); window._reminderInterval = null; }
+      if(typeof chatHistory !== 'undefined') chatHistory = [];
       updateTopbarUser();
       showSyncStatus('');
       setAuthStatus('');
       document.getElementById('authOverlay').classList.remove('hidden');
     }
   });
-
-  // ── Step 3: Verify actual session from server ──
-  try {
-    const { data:{ session } } = await sb.auth.getSession();
-
-    if(session?.user){
-      _currentUser = session.user; // replace provisional with real user object
-      S('_savedUserId', session.user.id);
-      document.getElementById('authOverlay').classList.add('hidden');
-
-      if(!_appStarted){
-        startApp();
-      }
-      updateTopbarUser();
-
-      // Background sync — pull then re-render with real data
-      _pullFromCloud()
-        .then(()=>{ renderAll(); renderProfile(); renderModeAwareHome(); updateTopbarUser(); })
-        .catch(e => console.warn('Sync error:', e));
-
-    } else {
-      // No valid session
-      S('_savedUserId', null);
-      _currentUser = null;
-
-      if(_appStarted){
-        // Was showing app based on saved ID but session expired — go back to login
-        _appStarted = false;
-        document.getElementById('authOverlay').classList.remove('hidden');
-      } else if(!savedUser){
-        // Fresh visit — show auth
-        document.getElementById('authOverlay').classList.remove('hidden');
-      }
-    }
-  } catch(e){
-    console.warn('getSession error:', e);
-    if(!_appStarted){
-      document.getElementById('authOverlay').classList.remove('hidden');
-    }
-  }
 }
 
 /* ══════════════════════════════════════════════════════
