@@ -3203,7 +3203,15 @@ let _syncQueue = []; // offline queue
 function getSB(){
   if(_sb) return _sb;
   if(window.supabase){
-    _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        storage: window.localStorage,
+        storageKey: 'ef_sb_auth',
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    });
     return _sb;
   }
   return null;
@@ -3260,44 +3268,7 @@ async function _flushSync(){
 }
 
 /* Pull all data from Supabase → populate localStorage */
-async function _pullFromCloud(){
-  if(!_currentUser || !getSB()) return;
-  const uid = _currentUser.id;
-  const sb  = getSB();
-  try {
-    showSyncStatus('☁️ Syncing…');
-    const {data:prog} = await sb.from('user_progress').select('*').eq('user_id',uid).single();
-    if(prog){
-      const keys=['xp','wos','streak','mxp','prs','prc','txp','sxp','activeMode','normalGoal','normalSplit'];
-      keys.forEach(k=>{ if(prog[k]!==undefined) localStorage.setItem('ef_'+k, JSON.stringify(prog[k])); });
-    }
-    const {data:prof} = await sb.from('profiles').select('*').eq('id',uid).single();
-    if(prof){ const {id,updated_at,...p}=prof; localStorage.setItem('ef_profile', JSON.stringify(p)); }
-    const {data:hist} = await sb.from('workout_history').select('*').eq('user_id',uid).order('date',{ascending:false}).limit(200);
-    if(hist && hist.length){
-      const clean = hist.map(({id,user_id,...h})=>h);
-      localStorage.setItem('ef_history', JSON.stringify(clean));
-    }
-    const {data:perf} = await sb.from('exercise_performance').select('*').eq('user_id',uid);
-    if(perf && perf.length){
-      const grouped = {};
-      perf.forEach(p=>{
-        const key = 'ef_perf_'+p.mode+'_'+p.exercise_name.replace(/\s+/g,'_');
-        if(!grouped[key]) grouped[key]=[];
-        grouped[key].push({date:p.date,weight:p.weight,reps:p.reps,sets:p.sets});
-      });
-      Object.entries(grouped).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
-    }
-    const {data:nut} = await sb.from('nutrition_logs').select('*').eq('user_id',uid).order('date',{ascending:false}).limit(14);
-    if(nut && nut.length){
-      nut.forEach(n=>{ const {id,user_id,...rest}=n; localStorage.setItem('ef_nut_'+n.date, JSON.stringify({meals:rest.meals,water:rest.water})); });
-    }
-    showSyncStatus('✅ Synced!', true);
-  } catch(e){
-    console.warn('Pull error:',e);
-    showSyncStatus(''); // always hide on error
-  }
-}
+/* _pullFromCloud defined later in auth section — single definition */
 
 function showSyncStatus(msg, autohide=false){
   let el = document.getElementById('syncStatus');
@@ -6392,8 +6363,10 @@ window.authSkip = function(){
 
 async function onAuthSuccess(user){
   _currentUser = user;
-  document.getElementById('authOverlay').classList.add('hidden');
+  const authOv = document.getElementById('authOverlay');
+  if(authOv) authOv.classList.add('hidden');
   resetAppStarted();
+  // Pull cloud data FIRST — renderAll must see real data, not stale localStorage
   await _pullFromCloud();
   startApp();
   updateTopbarUser();
@@ -6406,12 +6379,12 @@ function updateTopbarUser(){
   if(_currentUser){
     const name = _currentUser.user_metadata?.name || L('profile',null)?.name || _currentUser.email?.split('@')[0] || 'User';
     if(nameEl) nameEl.textContent = name.slice(0,12);
-    if(syncEl){ syncEl.textContent='☁️ synced'; syncEl.style.display='block'; }
-    if(avEl)   avEl.textContent = name[0].toUpperCase();
+    if(syncEl){ syncEl.textContent='☁️'; syncEl.style.display='inline'; }
+    if(avEl && name)   avEl.textContent = name[0].toUpperCase();
   } else {
     const prof = L('profile',null);
     if(nameEl) nameEl.textContent = prof?.name || 'Guest';
-    if(syncEl){ syncEl.textContent='local only'; syncEl.style.display = prof ? 'block' : 'none'; }
+    if(syncEl) syncEl.style.display = 'none';
     if(avEl)   avEl.textContent = prof?.name?.[0]?.toUpperCase() || '?';
   }
 }
@@ -6653,15 +6626,13 @@ async function initAuth(){
       document.getElementById('authOverlay').classList.add('hidden');
 
       if(!wasLoggedIn || !_appStarted){
+        // Pull cloud data FIRST so startApp renders with real data
+        await _pullFromCloud();
         resetAppStarted();
         startApp();
         updateTopbarUser();
         if(event === 'SIGNED_IN'){
           showToast('✅ Welcome, '+(session.user.user_metadata?.name||session.user.email?.split('@')[0]||'Champion')+'!');
-          // Pull cloud data on new login
-          await _pullFromCloud();
-          renderAll();
-          renderModeAwareHome();
         }
       } else {
         updateTopbarUser();
@@ -6695,9 +6666,9 @@ async function initAuth(){
         updateTopbarUser();
       }
 
-      // Background sync — don't block the UI
+      // Background sync — pull first then re-render with real data
       _pullFromCloud()
-        .then(()=>{ renderAll(); renderModeAwareHome(); })
+        .then(()=>{ renderAll(); renderProfile(); renderModeAwareHome(); updateTopbarUser(); })
         .catch(e => console.warn('Sync error:', e));
 
     } else {
