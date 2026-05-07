@@ -6610,7 +6610,9 @@ async function initAuth(){
   // This prevents the onboarding flash on PWA reload
   const savedUser = L('_savedUserId', null);
   if(savedUser){
-    // User was previously logged in — show app immediately while we verify
+    // Temporarily mark as logged in so startApp() skips onboarding
+    // Real user object arrives from getSession() below — this is just a guard
+    _currentUser = { id: savedUser, _provisional: true };
     document.getElementById('authOverlay').classList.add('hidden');
     startApp();
   }
@@ -6619,8 +6621,8 @@ async function initAuth(){
   sb.auth.onAuthStateChange(async(event, session)=>{
     if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
       if(!session?.user) return;
-      const wasLoggedIn = !!_currentUser;
-      _currentUser = session.user;
+      const wasLoggedIn = !!_currentUser && !_currentUser._provisional;
+      _currentUser = session.user; // always replace with real object
       S('_savedUserId', session.user.id); // save for next load
 
       document.getElementById('authOverlay').classList.add('hidden');
@@ -6655,18 +6657,16 @@ async function initAuth(){
     const { data:{ session } } = await sb.auth.getSession();
 
     if(session?.user){
-      _currentUser = session.user;
+      _currentUser = session.user; // replace provisional with real user object
       S('_savedUserId', session.user.id);
       document.getElementById('authOverlay').classList.add('hidden');
 
       if(!_appStarted){
         startApp();
-        updateTopbarUser();
-      } else {
-        updateTopbarUser();
       }
+      updateTopbarUser();
 
-      // Background sync — pull first then re-render with real data
+      // Background sync — pull then re-render with real data
       _pullFromCloud()
         .then(()=>{ renderAll(); renderProfile(); renderModeAwareHome(); updateTopbarUser(); })
         .catch(e => console.warn('Sync error:', e));
