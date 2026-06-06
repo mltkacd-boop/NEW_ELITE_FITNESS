@@ -4432,6 +4432,9 @@ function calcStreak(){
 let toastT;
 function showToast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);}
 
+/* ── HTML escape helper — prevents XSS in innerHTML templates ── */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 function addXP(amount, muscles){
   if(!amount || isNaN(amount) || amount <= 0) return;
   xp += Math.round(amount);
@@ -4809,10 +4812,7 @@ function getSplitLabel(split){
   return {ppl:'PUSH / PULL / LEGS',cutting:'CUT SPLIT',strength:'5×5 STRENGTH',athletic:'ATHLETIC SPLIT'}[split]||split;
 }
 
-// Check deload banner every time workouts are rendered
-window.addEventListener('DOMContentLoaded', () => {
-  // Will also be called from goTab — safe to call multiple times (key prevents re-show)
-});
+// Check deload banner every time workouts are rendered — called from goTab('workout')
 
 window.toggleWO=function(i){
   const card=document.getElementById('woc'+i);
@@ -5862,219 +5862,7 @@ window.editProfile=function(){
   }
 };
 
-/* ══════════════════════════════════════════════════════
-   USER CHARACTER SVG RENDERER
-   Character evolves with level, mode & class
-══════════════════════════════════════════════════════ */
-function renderUserCharacter(){
-  const svg = document.getElementById('charSVG');
-  if(!svg) return;
-  const lv   = getLv();
-  const rank = getRank(xp);
-
-  // Skin tone options — pick from profile or default warm
-  const skinTones = ['#C8956A','#8D5524','#F1C27D','#FDBCB4','#E8B99A'];
-  const skinIdx   = profile?.skinTone ?? 0;
-  const skin      = skinTones[skinIdx % skinTones.length];
-  const skinDark  = shadeColor(skin, -20);
-  const skinShadow= shadeColor(skin, -35);
-
-  // Hair colour based on class
-  const hairCols  = {'Mass Builder':'#1a1a1a','Strength Beast':'#2C1810','Speed Demon':'#4a3728','Iron Warrior':'#0d0d0d'};
-  const hair      = hairCols[profile?.cls] || '#1a1a1a';
-
-  // Outfit colour based on mode
-  const outfitCols= {normal:'#2C2C2C', toji:'#1a0a0a', jinwoo:'#0d0d2e'};
-  const outfitAcc = {normal:'#D4AF37',  toji:'#8B0000',  jinwoo:'#4B43CF'};
-  const outfit    = outfitCols[activeMode] || outfitCols.normal;
-  const accent    = outfitAcc[activeMode]  || outfitAcc.normal;
-
-  // Body proportions evolve with level
-  const muscleScale = Math.min(1 + (lv-1)*0.04, 1.5); // bigger muscles per level
-  const chestW = Math.round(52 * muscleScale);
-  const armW   = Math.round(12 * muscleScale);
-  const legW   = Math.round(18 * muscleScale);
-
-  // Accessories unlock by level
-  const hasHeadband = lv >= 3;
-  const hasScar     = activeMode==='toji' && lv >= 5;
-  const hasShadowEye= activeMode==='jinwoo' && lv >= 4;
-  const hasGloves   = lv >= 7;
-  const hasBelt     = lv >= 2;
-
-  svg.innerHTML = `
-  <defs>
-    <linearGradient id="skinG" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="${skin}"/>
-      <stop offset="100%" stop-color="${skinDark}"/>
-    </linearGradient>
-    <linearGradient id="outfitG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${outfit}"/>
-      <stop offset="100%" stop-color="${shadeColor(outfit,-20)}"/>
-    </linearGradient>
-    <linearGradient id="pantG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${shadeColor(outfit,10)}"/>
-      <stop offset="100%" stop-color="${shadeColor(outfit,-30)}"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="2.5" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-    <radialGradient id="auraG" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="${accent}" stop-opacity=".4"/>
-      <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-
-  <!-- Aura glow (stronger at higher levels) -->
-  ${lv >= 5 ? `<ellipse cx="80" cy="290" rx="${30+lv*2}" ry="10" fill="url(#auraG)" opacity="${Math.min(.8,(lv-4)*0.15)}"/>` : ''}
-
-  <!-- Shadow (ground) -->
-  <ellipse cx="80" cy="308" rx="35" ry="6" fill="rgba(0,0,0,.3)"/>
-
-  <!-- ── LEGS ── -->
-  <!-- Left leg -->
-  <rect x="${80-legW}" y="220" width="${legW-2}" height="78" rx="6" fill="url(#pantG)"/>
-  <!-- Right leg -->
-  <rect x="82" y="220" width="${legW-2}" height="78" rx="6" fill="url(#pantG)"/>
-  <!-- Knee lines -->
-  <line x1="${80-legW+4}" y1="258" x2="${80-4}" y2="258" stroke="${shadeColor(outfit,-40)}" stroke-width="1.5" stroke-linecap="round"/>
-  <line x1="84" y1="258" x2="${82+legW-6}" y2="258" stroke="${shadeColor(outfit,-40)}" stroke-width="1.5" stroke-linecap="round"/>
-  <!-- Shoes -->
-  <rect x="${80-legW-2}" y="293" width="${legW+2}" height="14" rx="5" fill="#1a1a1a"/>
-  <rect x="81" y="293" width="${legW+2}" height="14" rx="5" fill="#1a1a1a"/>
-  <rect x="${80-legW-2}" y="293" width="${legW+2}" height="5" rx="3" fill="#111"/>
-  <rect x="81" y="293" width="${legW+2}" height="5" rx="3" fill="#111"/>
-
-  <!-- ── TORSO ── -->
-  <rect x="${80-chestW/2}" y="130" width="${chestW}" height="94" rx="10" fill="url(#outfitG)"/>
-  <!-- Chest muscle definition (lv 3+) -->
-  ${lv >= 3 ? `
-  <path d="M${80-chestW/2+4} 145 Q${80-6} 158 ${80-2} 163" stroke="${shadeColor(outfit,-25)}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  <path d="M${80+chestW/2-4} 145 Q${80+6} 158 ${80+2} 163" stroke="${shadeColor(outfit,-25)}" stroke-width="1.5" fill="none" stroke-linecap="round"/>` : ''}
-  <!-- Abs lines (lv 5+, shirtless look) -->
-  ${lv >= 5 && activeMode==='toji' ? `
-  <rect x="${80-chestW/2}" y="130" width="${chestW}" height="94" rx="10" fill="${skin}" opacity=".9"/>
-  <line x1="${80-8}" y1="145" x2="${80-8}" y2="224" stroke="${skinShadow}" stroke-width="1" opacity=".5"/>
-  <line x1="${80+8}" y1="145" x2="${80+8}" y2="224" stroke="${skinShadow}" stroke-width="1" opacity=".5"/>
-  <line x1="${80-chestW/2+8}" y1="168" x2="${80+chestW/2-8}" y2="168" stroke="${skinShadow}" stroke-width="1" opacity=".4"/>
-  <line x1="${80-chestW/2+8}" y1="188" x2="${80+chestW/2-8}" y2="188" stroke="${skinShadow}" stroke-width="1" opacity=".4"/>
-  <line x1="${80-chestW/2+8}" y1="208" x2="${80+chestW/2-8}" y2="208" stroke="${skinShadow}" stroke-width="1" opacity=".4"/>` : ''}
-  <!-- Belt -->
-  ${hasBelt ? `<rect x="${80-chestW/2}" y="216" width="${chestW}" height="10" rx="3" fill="${accent}" opacity=".7"/>
-  <rect x="76" y="214" width="8" height="13" rx="2" fill="${shadeColor(accent,20)}"/>` : ''}
-  <!-- Mode accent stripe on outfit -->
-  <rect x="${80-chestW/2+3}" y="134" width="4" height="86" rx="2" fill="${accent}" opacity=".4"/>
-
-  <!-- ── ARMS ── -->
-  <!-- Left upper arm -->
-  <rect x="${80-chestW/2-armW}" y="132" width="${armW}" height="52" rx="${armW/2}" fill="url(#skinG)"/>
-  <!-- Left forearm -->
-  <rect x="${80-chestW/2-armW+1}" y="182" width="${armW-2}" height="44" rx="${(armW-2)/2}" fill="url(#skinG)"/>
-  <!-- Right upper arm -->
-  <rect x="${80+chestW/2}" y="132" width="${armW}" height="52" rx="${armW/2}" fill="url(#skinG)"/>
-  <!-- Right forearm -->
-  <rect x="${80+chestW/2+1}" y="182" width="${armW-2}" height="44" rx="${(armW-2)/2}" fill="url(#skinG)"/>
-  <!-- Gloves (lv 7+) -->
-  ${hasGloves ? `
-  <rect x="${80-chestW/2-armW}" y="210" width="${armW}" height="16" rx="5" fill="${shadeColor(accent,-20)}" opacity=".85"/>
-  <rect x="${80+chestW/2}" y="210" width="${armW}" height="16" rx="5" fill="${shadeColor(accent,-20)}" opacity=".85"/>` : ''}
-  <!-- Fists / hands -->
-  <ellipse cx="${80-chestW/2-armW/2}" cy="230" rx="${armW/2-1}" ry="${armW/2}" fill="url(#skinG)"/>
-  <ellipse cx="${80+chestW/2+armW/2}" cy="230" rx="${armW/2-1}" ry="${armW/2}" fill="url(#skinG)"/>
-  <!-- Arm muscle definition (lv 4+) -->
-  ${lv >= 4 ? `
-  <path d="M${80-chestW/2-armW+2} 155 Q${80-chestW/2-2} 163 ${80-chestW/2-2} 175" stroke="${skinShadow}" stroke-width="1.5" fill="none" opacity=".5"/>
-  <path d="M${80+chestW/2+armW-2} 155 Q${80+chestW/2+2} 163 ${80+chestW/2+2} 175" stroke="${skinShadow}" stroke-width="1.5" fill="none" opacity=".5"/>` : ''}
-
-  <!-- ── NECK ── -->
-  <rect x="72" y="113" width="16" height="22" rx="5" fill="url(#skinG)"/>
-
-  <!-- ── HEAD ── -->
-  <!-- Head shape -->
-  <ellipse cx="80" cy="95" rx="28" ry="30" fill="url(#skinG)"/>
-  <!-- Jaw definition -->
-  <path d="M55 100 Q80 130 105 100" fill="${skinDark}" opacity=".15"/>
-  <!-- Hair -->
-  <ellipse cx="80" cy="70" rx="29" ry="18" fill="${hair}"/>
-  <path d="M51 78 Q46 68 52 60 Q60 52 80 50 Q100 52 108 60 Q114 68 109 78" fill="${hair}"/>
-  <!-- Hair strands -->
-  <path d="M60 52 Q65 44 72 48" stroke="${shadeColor(hair,20)}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  <path d="M80 50 Q82 42 88 46" stroke="${shadeColor(hair,20)}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  <!-- Headband (lv 3+) -->
-  ${hasHeadband ? `<rect x="52" y="76" width="56" height="8" rx="4" fill="${accent}" opacity=".85"/>
-  <rect x="76" y="74" width="8" height="11" rx="3" fill="${shadeColor(accent,20)}"/>` : ''}
-  <!-- Ears -->
-  <ellipse cx="52" cy="95" rx="5" ry="7" fill="url(#skinG)"/>
-  <ellipse cx="108" cy="95" rx="5" ry="7" fill="url(#skinG)"/>
-  <!-- Eyes -->
-  <ellipse cx="68" cy="92" rx="6" ry="5" fill="white"/>
-  <ellipse cx="92" cy="92" rx="6" ry="5" fill="white"/>
-  <!-- Pupils — blue/indigo for jinwoo, green for normal, red for toji -->
-  <circle cx="70" cy="93" r="3.5" fill="${activeMode==='toji'?'#C0392B':activeMode==='jinwoo'?'#6B63FF':'#2C6E49'}"/>
-  <circle cx="94" cy="93" r="3.5" fill="${activeMode==='toji'?'#C0392B':activeMode==='jinwoo'?'#6B63FF':'#2C6E49'}"/>
-  <!-- Shine on eyes -->
-  <circle cx="72" cy="91" r="1.2" fill="white" opacity=".7"/>
-  <circle cx="96" cy="91" r="1.2" fill="white" opacity=".7"/>
-  <!-- Jin-Woo shadow under eye -->
-  ${hasShadowEye ? `<path d="M62 97 Q68 103 76 98" stroke="#6B63FF" stroke-width="1.5" fill="none" opacity=".6" stroke-linecap="round"/>
-  <path d="M84 97 Q90 103 98 98" stroke="#6B63FF" stroke-width="1.5" fill="none" opacity=".6" stroke-linecap="round"/>` : ''}
-  <!-- Eyebrows -->
-  <path d="M62 85 Q68 82 74 84" stroke="${hair}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <path d="M86 84 Q92 82 98 85" stroke="${hair}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <!-- Nose -->
-  <path d="M78 95 Q80 102 82 95" stroke="${skinShadow}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-  <!-- Mouth -->
-  <path d="M72 108 Q80 114 88 108" stroke="${skinShadow}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-  <!-- Toji scar on lip -->
-  ${hasScar ? `<path d="M85 107 L88 112" stroke="#8B0000" stroke-width="1.5" stroke-linecap="round"/>` : ''}
-
-  <!-- ── LEVEL EFFECT ── -->
-  ${lv >= 10 ? `
-  <!-- Mythic aura lines -->
-  <line x1="80" y1="60" x2="70" y2="30" stroke="${accent}" stroke-width="1" opacity=".3" stroke-linecap="round"/>
-  <line x1="80" y1="60" x2="90" y2="30" stroke="${accent}" stroke-width="1" opacity=".3" stroke-linecap="round"/>
-  <line x1="52" y1="95" x2="25" y2="85" stroke="${accent}" stroke-width="1" opacity=".3" stroke-linecap="round"/>
-  <line x1="108" y1="95" x2="135" y2="85" stroke="${accent}" stroke-width="1" opacity=".3" stroke-linecap="round"/>` : ''}
-  ${lv >= 6 ? `<ellipse cx="80" cy="160" rx="${chestW/2+armW+4}" ry="100" stroke="${accent}" stroke-width="1" fill="none" opacity="${Math.min(.3,(lv-5)*.05)}" stroke-dasharray="4,8"/>` : ''}
-  `;
-
-  // Animate particles
-  const container = document.getElementById('charParticles');
-  if(container && container.children.length === 0){
-    for(let i=0;i<12;i++){
-      const p = document.createElement('div');
-      p.className = 'char-particle';
-      p.style.cssText = `
-        width:${3+Math.random()*5}px;height:${3+Math.random()*5}px;
-        left:${5+Math.random()*40}%;bottom:${Math.random()*30}%;
-        background:${accent};
-        animation-duration:${2+Math.random()*4}s;
-        animation-delay:${Math.random()*3}s;
-      `;
-      container.appendChild(p);
-    }
-  }
-
-  // Mode glow
-  const glow = document.getElementById('charModeGlow');
-  if(glow) glow.style.background = accent;
-}
-
-function shadeColor(col, pct){
-  // lighten/darken a hex color by percent
-  try {
-    let c = col.replace('#','');
-    if(c.length===3) c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
-    const num=parseInt(c,16);
-    const r=Math.min(255,Math.max(0,((num>>16)&0xff)+Math.round(2.55*pct)));
-    const g=Math.min(255,Math.max(0,((num>>8)&0xff)+Math.round(2.55*pct)));
-    const b=Math.min(255,Math.max(0,(num&0xff)+Math.round(2.55*pct)));
-    return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
-  } catch(e){ return col; }
-}
-
-function renderProfile(){
+/*function renderProfile(){
   profile = L('profile', null);
   if(!profile){
     document.getElementById('profileSetup').style.display='block';
@@ -6724,8 +6512,8 @@ function renderHistory(){
           <div class="hist-item-top">
             <div class="hist-item-ico" style="background:${col}18;border-color:${col}30;">${h.ico||'💪'}</div>
             <div class="hist-item-info">
-              <div class="hist-item-name">${h.name}</div>
-              <div class="hist-item-meta">${h.meta||''} · ${dur} · ${h.sets||0} sets${h.note ? ' · 📝' : ''}</div>
+              <div class="hist-item-name">${esc(h.name)}</div>
+              <div class="hist-item-meta">${esc(h.meta||'')} · ${dur} · ${h.sets||0} sets${h.note ? ' · 📝' : ''}</div>
             </div>
             <div class="hist-item-xp" style="color:${col};">+${h.xp||0} XP</div>
             <div class="hist-item-chevron">›</div>
@@ -6737,7 +6525,7 @@ function renderHistory(){
             <div class="hist-detail-row"><span>XP Earned</span><span>+${h.xp||0}</span></div>
             ${h.muscles && h.muscles.length ? `<div class="hist-detail-row"><span>Muscles</span><span>${h.muscles.join(', ')}</span></div>` : ''}
             <div class="hist-detail-row"><span>Time</span><span>${timeStr}</span></div>
-            ${h.note ? `<div class="hist-detail-row" style="flex-direction:column;align-items:flex-start;gap:.2rem;"><span>📝 Note</span><span style="font-size:.72rem;color:var(--txt);font-style:italic;line-height:1.5;">${h.note}</span></div>` : ''}
+            ${h.note ? `<div class="hist-detail-row" style="flex-direction:column;align-items:flex-start;gap:.2rem;"><span>📝 Note</span><span style="font-size:.72rem;color:var(--txt);font-style:italic;line-height:1.5;">${esc(h.note)}</span></div>` : ''}
             ${h.volume ? `<div class="hist-detail-row" style="flex-direction:column;gap:.2rem;align-items:flex-start;"><span style="margin-bottom:.2rem;">Volume</span><span style="font-size:.65rem;color:var(--muted);line-height:1.5;">${h.volume.replace(/\|/g,'<br>')}</span></div>` : ''}
           </div>
         </div>`;
@@ -6760,7 +6548,7 @@ function renderHomeHistoryPreview(){
     try { ago = getTimeAgo(new Date(h.date)); } catch(e){ ago = 'Recently'; }
     return `<div class="home-hist-item" onclick="goTab('history')">
       <div class="hhi-ico" style="background:${col}15;">${h.ico || '💪'}</div>
-      <div class="hhi-info"><div class="hhi-name">${h.name}</div><div class="hhi-meta">${ago}</div></div>
+      <div class="hhi-info"><div class="hhi-name">${esc(h.name)}</div><div class="hhi-meta">${ago}</div></div>
       <div class="hhi-xp" style="color:${col};">+${h.xp || 0} XP</div>
     </div>`;
   }).join('');
@@ -8168,10 +7956,10 @@ function renderAWMatchTracker(matches){
     <div class="aw-match-item ${m.result.toLowerCase()}">
       <div style="font-size:1.2rem;">${m.result==='WIN'?'🏆':m.result==='LOSS'?'💀':'🤝'}</div>
       <div style="flex:1;">
-        <div style="font-size:.8rem;font-weight:700;color:var(--txt);">vs ${m.opponent||'Unknown'}</div>
-        <div style="font-size:.62rem;color:var(--muted);">${m.technique} · ${m.date?new Date(m.date).toLocaleDateString('en',{month:'short',day:'numeric'}):'—'}</div>
-        ${m.lossReason?`<div style="font-size:.6rem;color:var(--red);font-weight:600;margin-top:.1rem;">⚠ ${m.lossReason}</div>`:''}
-        ${m.notes?`<div style="font-size:.6rem;color:var(--muted);font-style:italic;margin-top:.1rem;">${m.notes}</div>`:''}
+        <div style="font-size:.8rem;font-weight:700;color:var(--txt);">vs ${esc(m.opponent||'Unknown')}</div>
+        <div style="font-size:.62rem;color:var(--muted);">${esc(m.technique)} · ${m.date?new Date(m.date).toLocaleDateString('en',{month:'short',day:'numeric'}):'—'}</div>
+        ${m.lossReason?`<div style="font-size:.6rem;color:var(--red);font-weight:600;margin-top:.1rem;">⚠ ${esc(m.lossReason)}</div>`:''}
+        ${m.notes?`<div style="font-size:.6rem;color:var(--muted);font-style:italic;margin-top:.1rem;">${esc(m.notes)}</div>`:''}
       </div>
       <div style="font-size:.7rem;font-weight:700;color:${m.result==='WIN'?'var(--green)':m.result==='LOSS'?'var(--red)':'var(--gold)'};">${m.result}</div>
     </div>`).join('');
@@ -8982,11 +8770,11 @@ function renderNutrition(){
           ? `<div class="nut-meal-empty">Nothing logged yet</div>`
           : items.map((f,i)=>`
             <div class="nut-food-item">
-              <div class="nut-food-name">${f.name}</div>
+              <div class="nut-food-name">${esc(f.name)}</div>
               <div class="nut-food-macros">
                 <span style="color:var(--gold);font-weight:700;">${f.cal} kcal</span>
                 <span>P:${f.p}g C:${f.c}g F:${f.f}g</span>
-                ${f.serving?`<span>${f.serving}</span>`:''}
+                ${f.serving?`<span>${esc(f.serving)}</span>`:''}
               </div>
               <button class="nut-food-del" onclick="deleteFood('${m.key}',${i})">✕</button>
             </div>`).join('')}
@@ -9189,7 +8977,7 @@ function renderPresetGrid(){
     <div class="nut-qf" onclick="quickPickPreset(${i})" style="position:relative;">
       <span class="nut-qf-ico">${pr.ico||'⭐'}</span>
       <div class="nut-qf-info">
-        <div class="nut-qf-name">${pr.n}</div>
+        <div class="nut-qf-name">${esc(pr.n)}</div>
         <div class="nut-qf-macro">${pr.cal}kcal${pr.p?'·P'+pr.p+'g':''}</div>
       </div>
       <span onclick="deletePreset(${i}, event)" style="position:absolute;top:4px;right:6px;font-size:.7rem;color:var(--muted);cursor:pointer;padding:2px 4px;line-height:1;" title="Remove preset">✕</span>
