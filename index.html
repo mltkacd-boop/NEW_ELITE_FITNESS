@@ -3415,168 +3415,175 @@ body.mode-jinwoo .prog-seg-btn.active{color:#8B85FF;}
 </div>
 
 <div class="page" id="page-armwrestling">
-  <!-- HERO -->
-  <div class="page-header" style="padding:1.5rem 2rem .6rem;">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.3rem;">
-      <div style="display:flex;align-items:center;gap:.8rem;">
-        <div style="font-size:2.2rem;animation:flicker 1.8s ease-in-out infinite alternate;">🤛</div>
-        <div>
-          <div class="page-title" style="font-size:1.6rem;">ARM WRESTLING</div>
-          <div class="page-sub">Build elite hand, wrist, pronation and table strength</div>
+
+  <div style="padding:1.2rem 1.5rem 2rem;" id="awPageContent">
+
+    <!-- ══ HERO ══ -->
+    <div id="awHeroCard" class="card" style="background:linear-gradient(135deg,#1a1400,#201a00);border-color:rgba(212,175,55,.25);margin-bottom:1rem;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.12),transparent 70%);pointer-events:none;"></div>
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.9rem;">
+        <div id="awRankBadge" style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--golddk));display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;border:3px solid rgba(212,175,55,.4);">🏆</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.55rem;font-weight:700;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">ARM WRESTLING</div>
+          <div id="awRankName" style="font-family:'Bebas Neue',cursive;font-size:1.6rem;letter-spacing:1px;color:var(--gold);line-height:1.1;">NOVICE</div>
+          <div id="awRankXP" style="font-size:.62rem;color:var(--muted);margin-top:.1rem;">0 / 500 XP to next rank</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div id="awWinRate" style="font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--green);line-height:1;">0%</div>
+          <div style="font-size:.5rem;color:var(--muted);letter-spacing:.5px;">WIN RATE</div>
         </div>
       </div>
-      <button onclick="goTab('more')" class="page-header-back">← More</button>
-    </div>
-  </div>
-
-  <div style="padding:0 2rem 2rem;" id="awPageContent">
-
-    <!-- ── HERO CARD ── -->
-    <div class="card" id="awHeroCard" style="background:linear-gradient(135deg,#1a1400,#201a00);border-color:rgba(212,175,55,.25);margin-bottom:1rem;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.15),transparent 70%);pointer-events:none;"></div>
-      <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1rem;">
-        <div id="awRankBadge" style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--golddk));display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;border:3px solid rgba(212,175,55,.4);animation:tojiPulse 3s ease-in-out infinite;">🏆</div>
-        <div style="flex:1;">
-          <div style="font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:.2rem;">CURRENT RANK</div>
-          <div id="awRankName" style="font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:2px;color:var(--gold);line-height:1;">NOVICE</div>
-          <div id="awRankXP" style="font-size:.65rem;color:var(--muted);margin-top:.1rem;">0 / 500 AW XP to next rank</div>
+      <div class="pc-xp-bar-bg" style="margin-bottom:.8rem;"><div id="awXPBar" class="pc-xp-bar-fg" style="width:0%"></div></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;">
+        <div style="text-align:center;background:rgba(0,0,0,.3);border-radius:8px;padding:.5rem .3rem;">
+          <div id="awTotalXP" style="font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--gold);">0</div>
+          <div style="font-size:.45rem;color:var(--muted);letter-spacing:.5px;margin-top:.1rem;">AW XP</div>
         </div>
-        <div style="text-align:center;flex-shrink:0;">
-          <div id="awWinRate" style="font-family:'Bebas Neue',cursive;font-size:2rem;color:var(--green);line-height:1;">0%</div>
-          <div style="font-size:.52rem;color:var(--muted);letter-spacing:.5px;">WIN RATE</div>
+        <div style="text-align:center;background:rgba(0,0,0,.3);border-radius:8px;padding:.5rem .3rem;">
+          <div id="awWinsHero" style="font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--green);">0</div>
+          <div style="font-size:.45rem;color:var(--muted);letter-spacing:.5px;margin-top:.1rem;">WINS</div>
         </div>
-      </div>
-      <div class="pc-xp-bar-bg"><div id="awXPBar" class="pc-xp-bar-fg" style="width:0%"></div></div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.8rem;">
-        <div style="text-align:center;background:rgba(0,0,0,.3);border-radius:10px;padding:.6rem .4rem;">
-          <div id="awTotalXP" style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--gold);">0</div>
-          <div style="font-size:.48rem;color:var(--muted);letter-spacing:.5px;">AW XP</div>
+        <div style="text-align:center;background:rgba(0,0,0,.3);border-radius:8px;padding:.5rem .3rem;">
+          <div id="awLossesHero" style="font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--red);">0</div>
+          <div style="font-size:.45rem;color:var(--muted);letter-spacing:.5px;margin-top:.1rem;">LOSSES</div>
         </div>
-        <div style="text-align:center;background:rgba(0,0,0,.3);border-radius:10px;padding:.6rem .4rem;">
-          <div id="awWinsHero" style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--green);">0</div>
-          <div style="font-size:.48rem;color:var(--muted);letter-spacing:.5px;">WINS</div>
-        </div>
-        <div style="text-align:center;background:rgba(0,0,0,.3);border-radius:10px;padding:.6rem .4rem;">
-          <div id="awLossesHero" style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--red);">0</div>
-          <div style="font-size:.48rem;color:var(--muted);letter-spacing:.5px;">LOSSES</div>
-        </div>
-        <div style="text-align:center;background:rgba(0,0,0,.3);border-radius:10px;padding:.6rem .4rem;">
-          <div id="awStrongestLift" style="font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--cyan);">—</div>
-          <div style="font-size:.48rem;color:var(--muted);letter-spacing:.5px;">BEST PR</div>
+        <div style="text-align:center;background:rgba(0,0,0,.3);border-radius:8px;padding:.5rem .3rem;">
+          <div id="awStrongestLift" style="font-family:'Bebas Neue',cursive;font-size:.9rem;color:var(--cyan);">—</div>
+          <div style="font-size:.45rem;color:var(--muted);letter-spacing:.5px;margin-top:.1rem;">BEST PR</div>
         </div>
       </div>
     </div>
 
-    <!-- ── ARM WRESTLING JOURNEY ── -->
+    <!-- ══ TRAINING MODE CHOOSER (shown only before mode is picked) ══ -->
+    <div id="awTrainingModeChooser" style="display:none;margin-bottom:1rem;">
+      <div class="card" style="border-color:rgba(212,175,55,.2);">
+        <div style="margin-bottom:1rem;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1.5px;color:var(--gold);">CHOOSE YOUR TRAINING STYLE</div>
+          <div style="font-size:.7rem;color:var(--muted);margin-top:.2rem;">You can switch anytime from settings.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.7rem;">
+          <div onclick="chooseAWTrainingMode('guided')" class="aw-mode-card" id="awchoose-guided" style="background:rgba(212,175,55,.06);border:1.5px solid rgba(212,175,55,.2);border-radius:12px;padding:1rem;cursor:pointer;display:flex;align-items:center;gap:.9rem;">
+            <div style="font-size:1.5rem;flex-shrink:0;">🗺️</div>
+            <div>
+              <div style="font-weight:700;font-size:.82rem;color:var(--gold);">Guided Journey</div>
+              <div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">12-week plan · daily recommendations · beginner friendly</div>
+            </div>
+            <div style="margin-left:auto;font-size:.7rem;color:var(--gold);">→</div>
+          </div>
+          <div onclick="chooseAWTrainingMode('free')" class="aw-mode-card" id="awchoose-free" style="background:rgba(139,92,246,.06);border:1.5px solid rgba(139,92,246,.2);border-radius:12px;padding:1rem;cursor:pointer;display:flex;align-items:center;gap:.9rem;">
+            <div style="font-size:1.5rem;flex-shrink:0;">⚡</div>
+            <div>
+              <div style="font-weight:700;font-size:.82rem;color:var(--purple);">Free Training</div>
+              <div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">All workouts unlocked · train on your own schedule</div>
+            </div>
+            <div style="margin-left:auto;font-size:.7rem;color:var(--purple);">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ JOURNEY (rendered by JS) ══ -->
     <div id="awJourneyEl" style="margin-bottom:1rem;"></div>
 
-    <!-- ── TRAINING INSPIRATIONS (advanced / free mode only) ── -->
-    <div id="awInspirationsSection" style="display:none;margin-bottom:1rem;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
-        <div class="sec-label" style="margin-bottom:0;">TRAINING INSPIRATIONS</div>
-        <button onclick="toggleAWInspirations()" id="awInspToggleBtn" style="background:none;border:none;color:var(--muted);font-size:.65rem;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline;padding:.2rem;">Show ▼</button>
-      </div>
-      <div id="awInspirationsEl" style="display:none;"></div>
-    </div>
-
-    <!-- ── AW MODE SELECTOR (hidden — kept for selectAWMode() compatibility) ── -->
+    <!-- hidden compat stubs ── -->
     <div style="display:none;" id="awModeGrid">
       <div class="aw-mode-card" id="awmode-devon" onclick="selectAWMode('devon')"></div>
       <div class="aw-mode-card" id="awmode-levan" onclick="selectAWMode('levan')"></div>
       <div class="aw-mode-card" id="awmode-vitaly" onclick="selectAWMode('vitaly')"></div>
     </div>
+    <div id="awInspirationsSection" style="display:none;"><div id="awInspirationsEl"></div><button id="awInspToggleBtn" onclick="toggleAWInspirations()" style="display:none;"></button></div>
 
-    <!-- ── ARM STATS ── -->
+    <!-- ══ SECTION: TRAIN ══ -->
+    <div style="font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:.6rem;padding:.2rem 0;">DAILY QUESTS</div>
+
+    <!-- Daily Quests card -->
     <div class="card" style="margin-bottom:1rem;">
       <div class="card-hdr">
-        <div class="card-hdr-icon" style="background:rgba(212,175,55,.1);">📊</div>
-        <div class="card-hdr-title">ARM WRESTLING STATS</div>
-      </div>
-      <div id="awStatsEl" style="display:flex;flex-direction:column;gap:.55rem;"></div>
-    </div>
-
-    <!-- ── DAILY QUESTS ── -->
-    <div class="card" style="margin-bottom:1rem;">
-      <div class="card-hdr">
-        <div class="card-hdr-icon" style="background:rgba(239,68,68,.1);">🎯</div>
-        <div class="card-hdr-title">DAILY QUESTS</div>
-        <div class="card-hdr-right" id="awQuestReset" style="color:var(--muted);font-size:.6rem;"></div>
+        <div class="card-hdr-icon" style="background:rgba(239,68,68,.1);">�</div>
+        <div class="card-hdr-title">Daily Quests</div>
+        <div class="card-hdr-right" id="awQuestReset"></div>
       </div>
       <div id="awDailyQuestsEl"></div>
     </div>
 
-    <!-- ── WORKOUTS ── -->
-    <div class="sec-label" style="margin-bottom:.5rem;">ARM WRESTLING WORKOUTS</div>
+    <!-- Workouts -->
+    <div style="font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:.6rem;padding:.2rem 0;">WORKOUTS</div>
     <div id="awWorkoutsEl" style="margin-bottom:1rem;"></div>
 
-    <!-- ── TECHNIQUE TREE ── -->
+    <!-- Technique Tree -->
     <div class="card" style="margin-bottom:1rem;">
       <div class="card-hdr">
         <div class="card-hdr-icon" style="background:rgba(139,92,246,.1);">🌳</div>
-        <div class="card-hdr-title">TECHNIQUE TREE</div>
-        <div class="card-hdr-right" style="font-size:.6rem;color:var(--muted);">Tap to learn</div>
+        <div class="card-hdr-title">Technique Tree</div>
+        <div class="card-hdr-right">Tap to learn</div>
       </div>
       <div id="awTechTree" style="display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;"></div>
     </div>
 
-    <!-- ── MATCH TRACKER ── -->
+    <!-- ══ SECTION: COMPETE ══ -->
+    <div style="font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:.6rem;padding:.2rem 0;">MATCH RECORD</div>
+
+    <!-- Match Tracker + Analysis merged -->
     <div class="card" style="margin-bottom:1rem;">
       <div class="card-hdr">
         <div class="card-hdr-icon" style="background:rgba(34,197,94,.1);">⚔️</div>
-        <div class="card-hdr-title">MATCH TRACKER</div>
-        <button onclick="openAWMatchSheet()" style="margin-left:auto;padding:.3rem .8rem;border-radius:20px;background:linear-gradient(135deg,var(--gold),var(--golddk));color:#000;font-size:.6rem;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif;">+ LOG MATCH</button>
+        <div class="card-hdr-title">Match Tracker</div>
+        <button onclick="openAWMatchSheet()" style="margin-left:auto;padding:.28rem .75rem;border-radius:20px;background:linear-gradient(135deg,var(--gold),var(--golddk));color:#000;font-size:.6rem;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif;">+ LOG</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.8rem;">
-        <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:.7rem;text-align:center;">
-          <div id="awMatchWins" style="font-family:'Bebas Neue',cursive;font-size:1.6rem;color:var(--green);">0</div>
-          <div style="font-size:.5rem;color:var(--muted);letter-spacing:.5px;">WINS</div>
+        <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:.6rem;text-align:center;">
+          <div id="awMatchWins" style="font-family:'Bebas Neue',cursive;font-size:1.5rem;color:var(--green);">0</div>
+          <div style="font-size:.48rem;color:var(--muted);letter-spacing:.5px;">WINS</div>
         </div>
-        <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:.7rem;text-align:center;">
-          <div id="awMatchLosses" style="font-family:'Bebas Neue',cursive;font-size:1.6rem;color:var(--red);">0</div>
-          <div style="font-size:.5rem;color:var(--muted);letter-spacing:.5px;">LOSSES</div>
+        <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:.6rem;text-align:center;">
+          <div id="awMatchLosses" style="font-family:'Bebas Neue',cursive;font-size:1.5rem;color:var(--red);">0</div>
+          <div style="font-size:.48rem;color:var(--muted);letter-spacing:.5px;">LOSSES</div>
         </div>
-        <div style="background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.2);border-radius:10px;padding:.7rem;text-align:center;">
-          <div id="awMatchRate" style="font-family:'Bebas Neue',cursive;font-size:1.6rem;color:var(--gold);">0%</div>
-          <div style="font-size:.5rem;color:var(--muted);letter-spacing:.5px;">WIN RATE</div>
+        <div style="background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.2);border-radius:10px;padding:.6rem;text-align:center;">
+          <div id="awMatchRate" style="font-family:'Bebas Neue',cursive;font-size:1.5rem;color:var(--gold);">0%</div>
+          <div style="font-size:.48rem;color:var(--muted);letter-spacing:.5px;">RATE</div>
         </div>
       </div>
-      <div id="awMatchListEl" style="display:flex;flex-direction:column;gap:.5rem;max-height:280px;overflow-y:auto;"></div>
+      <div id="awMatchListEl" style="display:flex;flex-direction:column;gap:.4rem;max-height:240px;overflow-y:auto;"></div>
+      <!-- Analysis inline below match list -->
+      <div id="awMatchAnalysisEl" style="margin-top:.7rem;"></div>
     </div>
 
-    <!-- ── MATCH ANALYSIS ── -->
-    <div class="card" style="margin-bottom:1rem;">
-      <div class="card-hdr">
-        <div class="card-hdr-icon" style="background:rgba(239,68,68,.1);">🔍</div>
-        <div class="card-hdr-title">MATCH ANALYSIS</div>
-        <div class="card-hdr-right" style="font-size:.6rem;color:var(--muted);">Auto-recommendations</div>
-      </div>
-      <div id="awMatchAnalysisEl"></div>
-    </div>
-
-    <!-- ── PR TRACKER ── -->
+    <!-- Personal Records -->
     <div class="card" style="margin-bottom:1rem;">
       <div class="card-hdr">
         <div class="card-hdr-icon" style="background:rgba(0,212,255,.1);">🏆</div>
-        <div class="card-hdr-title">PERSONAL RECORDS</div>
-        <button onclick="openAWPRSheet()" style="margin-left:auto;padding:.3rem .8rem;border-radius:20px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);color:var(--cyan);font-size:.6rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">+ LOG PR</button>
+        <div class="card-hdr-title">Personal Records</div>
+        <button onclick="openAWPRSheet()" style="margin-left:auto;padding:.28rem .75rem;border-radius:20px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);color:var(--cyan);font-size:.6rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">+ LOG</button>
       </div>
-      <div id="awPRListEl" style="display:flex;flex-direction:column;gap:.5rem;"></div>
+      <div id="awPRListEl" style="display:flex;flex-direction:column;gap:.4rem;"></div>
     </div>
 
-    <!-- ── LEADERBOARD ── -->
+    <!-- ══ SECTION: PROGRESS ══ -->
+    <div style="font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:.6rem;padding:.2rem 0;">PROGRESS</div>
+
+    <!-- Arm Stats -->
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-hdr">
+        <div class="card-hdr-icon" style="background:rgba(212,175,55,.1);">📊</div>
+        <div class="card-hdr-title">Arm Stats</div>
+      </div>
+      <div id="awStatsEl" style="display:flex;flex-direction:column;gap:.5rem;"></div>
+    </div>
+
+    <!-- Summary + Achievements side by side -->
     <div class="card" style="margin-bottom:1rem;">
       <div class="card-hdr">
         <div class="card-hdr-icon" style="background:rgba(212,175,55,.1);">📋</div>
-        <div class="card-hdr-title">YOUR SUMMARY</div>
+        <div class="card-hdr-title">Your Summary</div>
       </div>
       <div id="awLeaderboardEl" style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;"></div>
     </div>
 
-    <!-- ── ACHIEVEMENTS ── -->
-    <div class="card" style="margin-bottom:1rem;">
+    <div class="card" style="margin-bottom:1.5rem;">
       <div class="card-hdr">
         <div class="card-hdr-icon" style="background:rgba(249,115,22,.1);">🎖️</div>
-        <div class="card-hdr-title">ACHIEVEMENTS</div>
+        <div class="card-hdr-title">Achievements</div>
         <div id="awAchCount" class="card-hdr-right" style="color:var(--gold);">0 / 0</div>
       </div>
       <div id="awAchievementsEl" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;"></div>
@@ -7878,6 +7885,8 @@ window.chooseAWTrainingMode = function(mode){
   S('awTrainingMode', mode);
   const m = document.getElementById('awOnboardModal');
   if(m) m.classList.remove('open');
+  const chooser = document.getElementById('awTrainingModeChooser');
+  if(chooser) chooser.style.display = 'none';
   if(mode === 'guided'){
     const st = { active:true, skipped:false, startDate:new Date().toISOString().split('T')[0], phase:1, path:null };
     saveAWRoadmapState(st);
@@ -8019,8 +8028,17 @@ function renderAWJourney(){
   const tm = L('awTrainingMode', null);
   const st = getAWRoadmapState();
 
-  /* ── Not yet chosen: hide section, modal handles it ── */
-  if(!tm){ el.innerHTML=''; return; }
+  /* ── Not yet chosen: show inline chooser ── */
+  if(!tm){
+    el.innerHTML='';
+    const chooser = document.getElementById('awTrainingModeChooser');
+    if(chooser) chooser.style.display = 'block';
+    return;
+  }
+
+  /* Mode chosen — hide the chooser */
+  const chooser = document.getElementById('awTrainingModeChooser');
+  if(chooser) chooser.style.display = 'none';
 
   /* ── FREE TRAINING: render catalog inline ── */
   if(tm === 'free'){
