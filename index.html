@@ -1726,6 +1726,84 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 .bn-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;transition:opacity .2s;}
 .bn-item.active .bn-dot{opacity:1;}
 
+/* page-header with back button — flex variant */
+.page-header-flex{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:.4rem;
+}
+.page-header-flex > div:first-child{flex:1;min-width:0;}
+.page-header-back{
+  margin-top:.3rem;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);border-radius:20px;
+  padding:.3rem .75rem;color:var(--muted);font-size:.6rem;font-weight:700;
+  cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;
+  flex-shrink:0;transition:all .2s;
+}
+.page-header-back:hover{background:rgba(255,255,255,.09);color:var(--txt);}
+/* More page — section label spacing */
+.more-page-wrap .sec-label{margin-top:.5rem;}
+
+/* ══════════════════════════════════════════════════════════
+   PROGRESS PAGE — SEGMENTED CONTROL
+══════════════════════════════════════════════════════════ */
+.prog-seg-wrap{
+  display:flex;padding:1rem 1.2rem .6rem;
+  position:sticky;top:0;z-index:50;
+  background:var(--bg);border-bottom:1px solid var(--line);
+}
+.prog-seg{
+  display:flex;background:rgba(255,255,255,.05);border:1px solid var(--line);
+  border-radius:12px;padding:3px;width:100%;
+}
+.prog-seg-btn{
+  flex:1;padding:.55rem .4rem;border-radius:9px;border:none;background:none;
+  color:var(--muted);font-family:'Inter',sans-serif;font-size:.72rem;
+  font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s;
+  text-transform:uppercase;
+}
+.prog-seg-btn.active{background:var(--card2);color:var(--txt);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+body.mode-toji .prog-seg-btn.active{color:#E74C3C;}
+body.mode-jinwoo .prog-seg-btn.active{color:#8B85FF;}
+.prog-tab{display:none;}
+.prog-tab.show{display:block;}
+
+/* ══════════════════════════════════════════════════════════
+   MORE PAGE
+══════════════════════════════════════════════════════════ */
+.more-page-wrap{padding:1.2rem 1.2rem 2rem;}
+.more-list{display:flex;flex-direction:column;gap:.55rem;}
+.more-item{
+  display:flex;align-items:center;gap:1rem;
+  padding:.95rem 1.1rem;background:var(--card);
+  border:1px solid var(--line);border-radius:14px;
+  cursor:pointer;transition:all .2s;
+}
+.more-item:hover{border-color:rgba(255,255,255,.12);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.25);}
+.more-item:active{transform:scale(.98);}
+.more-item-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.more-item-lbl{font-weight:700;font-size:.88rem;color:var(--txt);}
+.more-item-sub{font-size:.62rem;color:var(--muted);margin-top:.1rem;}
+.more-item-arrow{margin-left:auto;color:var(--dim);font-size:.9rem;flex-shrink:0;}
+
+/* ══════════════════════════════════════════════════════════
+   PROGRESSIVE DISCOVERY BANNERS (Home page)
+══════════════════════════════════════════════════════════ */
+.disc-banner{
+  margin:0 1.2rem .9rem;padding:1rem 1.1rem;
+  border-radius:14px;border:1px solid rgba(212,175,55,.3);
+  background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(212,175,55,.04));
+  animation:fadeIn .4s ease;
+}
+.disc-banner-top{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:.75rem;}
+.disc-banner-ico{font-size:1.5rem;flex-shrink:0;}
+.disc-banner-title{font-weight:700;font-size:.85rem;color:var(--txt);margin-bottom:.2rem;}
+.disc-banner-sub{font-size:.7rem;color:var(--muted);line-height:1.45;}
+.disc-banner-btns{display:flex;gap:.6rem;}
+.disc-banner-cta{flex:1;padding:.6rem .8rem;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--golddk));color:#000;font-size:.72rem;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;}
+.disc-banner-cta:hover{box-shadow:0 4px 14px rgba(212,175,55,.4);}
+.disc-banner-dismiss{padding:.6rem .8rem;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;}
+.disc-banner-dismiss:hover{background:rgba(255,255,255,.09);color:var(--txt);}
+
 /* ══════════════════════════════════════════════════════════
    RESPONSIVE BREAKPOINTS
 ══════════════════════════════════════════════════════════ */
@@ -1760,8 +1838,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
   .toji-session-section{padding:0 1.2rem 1.2rem;}
   .toji-mindset-section .mindset-grid{margin:0 1.2rem 1rem;}
   .toji-mindset-section .toji-stats-label{padding:0 1.2rem .8rem;}
-
-
+  /* New pages — mobile padding fixes */
+  .more-page-wrap{padding:.9rem 1.2rem 1.5rem;}
+  .prog-seg-wrap{padding:.75rem 1rem .5rem;}
+  /* page-header-flex — wrap on tiny screens so back button doesn't crush title */
+  .page-header-flex{flex-wrap:wrap;gap:.35rem;}
+  .page-header-flex > div:first-child{flex:1;min-width:0;}
 }
 
 /* ── TABLET (768–1099px) — sidebar + single col content ── */
@@ -2094,39 +2176,32 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
       <svg width="18" height="18" viewBox="0 0 40 22" fill="none"><rect x="2" y="6" width="6" height="10" rx="2" stroke="currentColor" stroke-width="2"/><rect x="0" y="4" width="4" height="14" rx="2" stroke="currentColor" stroke-width="2"/><rect x="32" y="6" width="6" height="10" rx="2" stroke="currentColor" stroke-width="2"/><rect x="36" y="4" width="4" height="14" rx="2" stroke="currentColor" stroke-width="2"/><rect x="8" y="9" width="24" height="4" rx="2" stroke="currentColor" stroke-width="2"/></svg>
       <span class="sn-label" id="snWorkoutLabel">Workout</span><div class="sn-dot"></div>
     </button>
-    <button class="sn-item" id="sn-levelup" onclick="goTab('levelup')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="sn-label">Level Up</span><div class="sn-dot"></div>
-    </button>
-    <!-- Toji/JinWoo nav - hidden when NOT in that mode, shown when IN that mode -->
-    <button class="sn-item sn-mode-char" id="sn-toji" onclick="goTab('toji')">
-      <span style="font-size:1rem;">⚔️</span>
-      <span class="sn-label">Toji</span><div class="sn-dot"></div>
-    </button>
-    <button class="sn-item sn-mode-char" id="sn-jinwoo" onclick="goTab('jinwoo')">
-      <span style="font-size:1rem;">🌑</span>
-      <span class="sn-label">Jin-Woo</span><div class="sn-dot"></div>
-    </button>
     <button class="sn-item" id="sn-nutrition" onclick="goTab('nutrition')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
       <span class="sn-label">Nutrition</span><div class="sn-dot"></div>
     </button>
-    <button class="sn-item" id="sn-history" onclick="goTab('history')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <span class="sn-label">History</span><div class="sn-dot"></div>
+    <button class="sn-item" id="sn-progress" onclick="goTab('progress')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="sn-label">Progress</span><div class="sn-dot"></div>
     </button>
-    <button class="sn-item" id="sn-chat" onclick="goTab('chat')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
-      <span class="sn-label">Elite Coach</span><div class="sn-dot"></div>
+    <button class="sn-item" id="sn-more" onclick="goTab('more')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      <span class="sn-label">More</span><div class="sn-dot"></div>
     </button>
-    <button class="sn-item" id="sn-armwrestling" onclick="goTab('armwrestling')">
-      <span style="font-size:1rem;">🤛</span>
-      <span class="sn-label">Arm Wrestling</span><div class="sn-dot"></div>
+    <!-- Hidden items retained for goTab() active-state lookups -->
+    <button class="sn-item sn-mode-char" id="sn-toji"         onclick="goTab('toji')"         style="display:none !important;">
+      <span style="font-size:1rem;">⚔️</span>
+      <span class="sn-label">Toji</span><div class="sn-dot"></div>
     </button>
-    <button class="sn-item" id="sn-profile" onclick="goTab('profile')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span class="sn-label">Profile</span><div class="sn-dot"></div>
+    <button class="sn-item sn-mode-char" id="sn-jinwoo"       onclick="goTab('jinwoo')"       style="display:none !important;">
+      <span style="font-size:1rem;">🌑</span>
+      <span class="sn-label">Jin-Woo</span><div class="sn-dot"></div>
     </button>
+    <button class="sn-item" id="sn-levelup"      onclick="goTab('levelup')"      style="display:none !important;"></button>
+    <button class="sn-item" id="sn-history"      onclick="goTab('history')"      style="display:none !important;"></button>
+    <button class="sn-item" id="sn-chat"         onclick="goTab('chat')"         style="display:none !important;"></button>
+    <button class="sn-item" id="sn-armwrestling" onclick="goTab('armwrestling')" style="display:none !important;"></button>
+    <button class="sn-item" id="sn-profile"      onclick="goTab('profile')"      style="display:none !important;"></button>
   </nav>
   <div class="sidebar-bottom">
     <div class="sb-xp">
@@ -2139,7 +2214,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
         <div class="sb-xp-bar-bg"><div class="sb-xp-bar-fg" id="sideXPBar" style="width:0%"></div></div>
       </div>
     </div>
-    <div class="sb-profile-row" onclick="goTab('profile')">
+    <div class="sb-profile-row" onclick="goTab('progress');setTimeout(()=>switchProgressTab('profile'),100)">
       <div class="sb-avatar" id="sideAvatar">?</div>
       <div>
         <div class="sb-name" id="sideName">Set up profile</div>
@@ -2188,6 +2263,35 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
       </div>
     </div>
     <button class="hmb-notify-btn" id="hmbNotifyBtn" onclick="openReminderSheet()" title="Set training reminder">🔔</button>
+  </div>
+
+  <!-- PROGRESSIVE DISCOVERY BANNERS — shown after milestones, once only -->
+  <div id="discBannerMode" style="display:none;" class="disc-banner">
+    <div class="disc-banner-top">
+      <div class="disc-banner-ico">⚔️</div>
+      <div>
+        <div class="disc-banner-title">You've been consistent for 3 days!</div>
+        <div class="disc-banner-sub">Want to try a themed training mode? Toji or Jin-Woo push your limits further.</div>
+      </div>
+    </div>
+    <div class="disc-banner-btns">
+      <button class="disc-banner-cta" onclick="S('modeUnlockSeen',true);document.getElementById('discBannerMode').style.display='none';openModeSelector();">Try Now</button>
+      <button class="disc-banner-dismiss" onclick="S('modeUnlockSeen',true);document.getElementById('discBannerMode').style.display='none';">Dismiss</button>
+    </div>
+  </div>
+
+  <div id="discBannerAW" style="display:none;border-color:rgba(0,212,255,.3);background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(0,212,255,.02));" class="disc-banner">
+    <div class="disc-banner-top">
+      <div class="disc-banner-ico">🤛</div>
+      <div>
+        <div class="disc-banner-title">Want to add Arm Wrestling training?</div>
+        <div class="disc-banner-sub">You've completed 5 workouts. Build elite hand, wrist, and table strength.</div>
+      </div>
+    </div>
+    <div class="disc-banner-btns">
+      <button class="disc-banner-cta" onclick="S('awUnlockSeen',true);document.getElementById('discBannerAW').style.display='none';goTab('armwrestling');">Open</button>
+      <button class="disc-banner-dismiss" onclick="S('awUnlockSeen',true);document.getElementById('discBannerAW').style.display='none';">Dismiss</button>
+    </div>
   </div>
 
   <!-- TODAY'S WORKOUT — mode-aware -->
@@ -2252,7 +2356,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
     <!-- Recent History preview -->
     <div class="sec-label" style="display:flex;align-items:center;justify-content:space-between;">
       <span>RECENT SESSIONS</span>
-      <button onclick="goTab('history')" style="background:none;border:none;color:var(--gold);font-size:.62rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:1px;">VIEW ALL →</button>
+      <button onclick="goTab('progress');setTimeout(()=>switchProgressTab('history'),100);" style="background:none;border:none;color:var(--gold);font-size:.62rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:1px;">VIEW ALL →</button>
     </div>
     <div id="homeHistoryPreview" class="home-history-preview"></div>
 
@@ -2269,14 +2373,19 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
         <div class="qa-ico" style="background:rgba(0,212,255,.1);">💪</div>
         <div><div class="qa-lbl">Workouts</div><div class="qa-sub">Start training</div></div>
       </div>
-      <div class="qa" onclick="goTab('levelup')">
+      <div class="qa" onclick="goTab('progress')">
         <div class="qa-ico" style="background:rgba(212,175,55,.1);">⭐</div>
-        <div><div class="qa-lbl">Level Up</div><div class="qa-sub">XP & muscles</div></div>
+        <div><div class="qa-lbl">Progress</div><div class="qa-sub">XP & muscles</div></div>
       </div>
-      <div class="qa" onclick="goTab('history')">
-        <div class="qa-ico" style="background:rgba(34,197,94,.1);">📋</div>
-        <div><div class="qa-lbl">History</div><div class="qa-sub">All sessions</div></div>
+      <div class="qa" onclick="goTab('nutrition')">
+        <div class="qa-ico" style="background:rgba(34,197,94,.1);">🥗</div>
+        <div><div class="qa-lbl">Nutrition</div><div class="qa-sub">Track macros</div></div>
       </div>
+      <div class="qa" onclick="goTab('more')">
+        <div class="qa-ico" style="background:rgba(139,92,246,.1);">⚙️</div>
+        <div><div class="qa-lbl">More</div><div class="qa-sub">Advanced tools</div></div>
+      </div>
+    </div>
       <div class="qa" onclick="goTab('chat')">
         <div class="qa-ico" style="background:rgba(139,92,246,.1);">�</div>
         <div><div class="qa-lbl">Elite Coach</div><div class="qa-sub">Analyse progress</div></div>
@@ -2296,9 +2405,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 
 <!-- ════ LEVEL UP PAGE ════ -->
 <div class="page" id="page-levelup">
-  <div class="page-header">
-    <div class="page-title">LEVEL UP</div>
-    <div class="page-sub">Earn XP every workout · rank every muscle</div>
+  <div class="page-header page-header-flex">
+    <div>
+      <div class="page-title">LEVEL UP</div>
+      <div class="page-sub">Earn XP every workout · rank every muscle</div>
+    </div>
+    <button onclick="goTab('progress')" class="page-header-back">← Progress</button>
   </div>
   <div class="levelup-page">
     <!-- Ranks -->
@@ -2366,6 +2478,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 
 <!-- ════ TOJI PAGE ════ -->
 <div class="page" id="page-toji">
+  <!-- Back to More -->
+  <div style="padding:.7rem 1.2rem .2rem;"><button onclick="goTab('more')" class="page-header-back" style="color:rgba(192,57,43,.8);background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.2);">← More</button></div>
 
   <!-- ── FULL CHARACTER SHOWCASE ── -->
   <div class="toji-showcase">
@@ -2511,6 +2625,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 
 <!-- ════ SUNG JIN-WOO PAGE ════ -->
 <div class="page" id="page-jinwoo">
+  <!-- Back to More -->
+  <div style="padding:.7rem 1.2rem .2rem;"><button onclick="goTab('more')" class="page-header-back" style="color:rgba(107,99,255,.9);background:rgba(107,99,255,.08);border-color:rgba(107,99,255,.2);">← More</button></div>
 
   <!-- ── FULL CHARACTER SHOWCASE ── -->
   <div class="toji-showcase" style="background:linear-gradient(180deg,rgba(108,99,255,.08) 0%,transparent 60%);border-bottom:1px solid rgba(108,99,255,.12);">
@@ -2845,9 +2961,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 
 <!-- ════ HISTORY PAGE ════ -->
 <div class="page" id="page-history">
-  <div class="page-header">
-    <div class="page-title">WORKOUT HISTORY</div>
-    <div class="page-sub">Every session you've completed · tap to expand</div>
+  <div class="page-header page-header-flex">
+    <div>
+      <div class="page-title">WORKOUT HISTORY</div>
+      <div class="page-sub">Every session you've completed · tap to expand</div>
+    </div>
+    <button onclick="goTab('progress')" class="page-header-back">← Progress</button>
   </div>
   <div style="padding:0 1.5rem 1.5rem;">
     <!-- Stats bar -->
@@ -3062,6 +3181,13 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 
 <!-- ════ COACH PAGE ════ -->
 <div class="page" id="page-chat">
+  <div class="page-header page-header-flex" style="padding:.9rem 1.2rem .5rem;">
+    <div>
+      <div class="page-title" style="font-size:1.4rem;">ELITE COACH</div>
+      <div class="page-sub" style="font-size:.68rem;">AI analysis of your real training data</div>
+    </div>
+    <button onclick="goTab('more')" class="page-header-back">← More</button>
+  </div>
   <div class="coach-wrap" id="coachWrap">
     <div class="coach-header">
       <div class="coach-header-icon">🧠</div>
@@ -3098,6 +3224,13 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 
 <!-- ════ PROFILE PAGE ════ -->
 <div class="page" id="page-profile">
+  <div class="page-header page-header-flex">
+    <div>
+      <div class="page-title">PROFILE</div>
+      <div class="page-sub">Your stats & personal records</div>
+    </div>
+    <button onclick="goTab('progress')" class="page-header-back">← Progress</button>
+  </div>
   <div class="profile-page">
 
     <!-- ── SETUP FORM ── -->
@@ -3284,12 +3417,15 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 <div class="page" id="page-armwrestling">
   <!-- HERO -->
   <div class="page-header" style="padding:1.5rem 2rem .6rem;">
-    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.3rem;">
-      <div style="font-size:2.2rem;animation:flicker 1.8s ease-in-out infinite alternate;">🤛</div>
-      <div>
-        <div class="page-title" style="font-size:1.6rem;">ARM WRESTLING</div>
-        <div class="page-sub">Build elite hand, wrist, pronation and table strength</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.3rem;">
+      <div style="display:flex;align-items:center;gap:.8rem;">
+        <div style="font-size:2.2rem;animation:flicker 1.8s ease-in-out infinite alternate;">🤛</div>
+        <div>
+          <div class="page-title" style="font-size:1.6rem;">ARM WRESTLING</div>
+          <div class="page-sub">Build elite hand, wrist, pronation and table strength</div>
+        </div>
       </div>
+      <button onclick="goTab('more')" class="page-header-back">← More</button>
     </div>
   </div>
 
@@ -3649,6 +3785,130 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 
 <div class="toast" id="toast"></div>
 
+<!-- ════ PROGRESS PAGE ════ -->
+<div class="page" id="page-progress">
+  <!-- Segmented control -->
+  <div class="prog-seg-wrap">
+    <div class="prog-seg">
+      <button class="prog-seg-btn active" id="progBtnStats"   onclick="switchProgressTab('stats')">Stats</button>
+      <button class="prog-seg-btn"        id="progBtnHistory" onclick="goTab('history')">History</button>
+      <button class="prog-seg-btn"        id="progBtnProfile" onclick="goTab('profile')">Profile</button>
+    </div>
+  </div>
+
+  <!-- Stats tab — reuses page-levelup content by reference (rendered via renderLevelUp) -->
+  <div class="prog-tab show" id="progTabStats">
+    <div class="page-header">
+      <div class="page-title">STATS</div>
+      <div class="page-sub">XP · ranks · muscle progress · weight</div>
+    </div>
+    <div class="levelup-page">
+      <div class="sec-label">RANK TIERS</div>
+      <div class="rank-tiers" id="rankTiers2"></div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-hdr-icon" style="background:rgba(212,175,55,.1);">💪</div><span class="card-hdr-title">Muscle Rankings</span></div>
+        <div class="muscle-list" id="muscleListEl2"></div>
+      </div>
+      <div class="card" id="exProgressCard2">
+        <div class="card-hdr">
+          <div class="card-hdr-icon" style="background:rgba(34,197,94,.1);">📈</div>
+          <span class="card-hdr-title">Progressive Overload Tracker</span>
+        </div>
+        <div class="exp-selector-wrap">
+          <select class="exp-select" id="expExSelect2" onchange="renderExChart2()">
+            <option value="">— Select an exercise —</option>
+          </select>
+        </div>
+        <div id="expChartWrap2">
+          <div class="exp-empty" id="expEmpty2">Complete workouts and log weights to see your progress chart here.</div>
+          <svg id="expSVG2" class="exp-svg" style="display:none;" viewBox="0 0 400 180" preserveAspectRatio="none"></svg>
+          <div class="exp-stats" id="expStats2" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-hdr-icon" style="background:rgba(0,212,255,.1);">📊</div><span class="card-hdr-title">This Week</span>
+          <button onclick="shareReport()" style="margin-left:auto;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);border-radius:20px;padding:.25rem .7rem;color:var(--gold);font-size:.62rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">SHARE</button>
+        </div>
+        <div class="report-stats">
+          <div class="rs-box"><div class="rs-ico">⭐</div><div class="rs-val" id="rXP2">0</div><div class="rs-lbl">XP EARNED</div></div>
+          <div class="rs-box"><div class="rs-ico">💪</div><div class="rs-val" id="rWO2">0</div><div class="rs-lbl">WORKOUTS</div></div>
+          <div class="rs-box"><div class="rs-ico">🔥</div><div class="rs-val" id="rST2">0</div><div class="rs-lbl">STREAK</div></div>
+          <div class="rs-box"><div class="rs-ico">🏆</div><div class="rs-val" id="rPR2">0</div><div class="rs-lbl">PRs HIT</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-hdr-icon" style="background:rgba(34,197,94,.1);">⚖️</div><span class="card-hdr-title">Weight Tracker</span></div>
+        <div class="wi-current" id="wtCurrent2">— kg</div>
+        <div class="wi-delta" id="wtDelta2"></div>
+        <div class="weight-input-row">
+          <input class="field-in" type="number" id="wtInput2" placeholder="Today's weight (kg)" step="0.1" min="30" max="300" style="flex:1;">
+          <button class="btn btn-gold" onclick="logWeightProg()" style="padding:.7rem 1rem;font-size:.75rem;flex-shrink:0;">LOG</button>
+        </div>
+        <div style="background:rgba(0,0,0,.3);border-radius:10px;padding:.8rem;overflow:hidden;">
+          <svg id="wtChart2" width="100%" height="120" viewBox="0 0 320 120">
+            <text x="160" y="65" text-anchor="middle" fill="#333" font-size="12" font-family="Inter,sans-serif">Log entries to see trend</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History tab — navigates to page-history directly (full functionality preserved) -->
+  <div class="prog-tab" id="progTabHistory" style="display:none;"></div>
+
+  <!-- Profile tab — navigates to page-profile directly (full functionality preserved) -->
+  <div class="prog-tab" id="progTabProfile" style="display:none;"></div>
+</div><!-- end page-progress -->
+
+<!-- ════ MORE PAGE ════ -->
+<div class="page" id="page-more">
+  <div class="page-header">
+    <div class="page-title">MORE</div>
+    <div class="page-sub">Advanced features & settings</div>
+  </div>
+  <div class="more-page-wrap">
+    <div class="sec-label">TRAINING MODES</div>
+    <div class="more-list" style="margin-bottom:1.2rem;">
+      <div class="more-item" onclick="goTab('toji')">
+        <div class="more-item-ico" style="background:rgba(192,57,43,.12);">⚔️</div>
+        <div><div class="more-item-lbl">Toji Mode</div><div class="more-item-sub">Heavenly Restriction training</div></div>
+        <div class="more-item-arrow">›</div>
+      </div>
+      <div class="more-item" onclick="goTab('jinwoo')">
+        <div class="more-item-ico" style="background:rgba(107,99,255,.12);">🌑</div>
+        <div><div class="more-item-lbl">Jin-Woo Mode</div><div class="more-item-sub">Solo Leveling system</div></div>
+        <div class="more-item-arrow">›</div>
+      </div>
+      <div class="more-item" onclick="goTab('armwrestling')">
+        <div class="more-item-ico" style="background:rgba(0,212,255,.1);">🤛</div>
+        <div><div class="more-item-lbl">Arm Wrestling</div><div class="more-item-sub">Specialised hand & wrist training</div></div>
+        <div class="more-item-arrow">›</div>
+      </div>
+    </div>
+    <div class="sec-label">TOOLS</div>
+    <div class="more-list" style="margin-bottom:1.2rem;">
+      <div class="more-item" onclick="goTab('chat')">
+        <div class="more-item-ico" style="background:rgba(212,175,55,.1);">🧠</div>
+        <div><div class="more-item-lbl">Elite Coach</div><div class="more-item-sub">AI analysis of your training</div></div>
+        <div class="more-item-arrow">›</div>
+      </div>
+      <div class="more-item" onclick="openReminderSheet()">
+        <div class="more-item-ico" style="background:rgba(34,197,94,.1);">🔔</div>
+        <div><div class="more-item-lbl">Training Reminder</div><div class="more-item-sub">Set your daily training alert</div></div>
+        <div class="more-item-arrow">›</div>
+      </div>
+    </div>
+    <div class="sec-label">SETTINGS</div>
+    <div class="more-list">
+      <div class="more-item" onclick="openModeSelector()">
+        <div class="more-item-ico" style="background:rgba(139,92,246,.1);">⚙️</div>
+        <div><div class="more-item-lbl">Switch Training Mode</div><div class="more-item-sub">Change programme or goal</div></div>
+        <div class="more-item-arrow">›</div>
+      </div>
+    </div>
+  </div>
+</div><!-- end page-more -->
+
 </div><!-- end pages-wrap -->
 </div><!-- end main-content -->
 </div><!-- end app-shell -->
@@ -3663,38 +3923,26 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
     <svg width="20" height="20" viewBox="0 0 40 22" fill="none"><rect x="2" y="6" width="6" height="10" rx="2" stroke="currentColor" stroke-width="2"/><rect x="0" y="4" width="4" height="14" rx="2" stroke="currentColor" stroke-width="2"/><rect x="32" y="6" width="6" height="10" rx="2" stroke="currentColor" stroke-width="2"/><rect x="36" y="4" width="4" height="14" rx="2" stroke="currentColor" stroke-width="2"/><rect x="8" y="9" width="24" height="4" rx="2" stroke="currentColor" stroke-width="2"/></svg>
     Workout<div class="bn-dot"></div>
   </button>
-  <button class="bn-item" id="bn-levelup" onclick="goTab('levelup')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-    Level Up<div class="bn-dot"></div>
-  </button>
-  <button class="bn-item" id="bn-toji" onclick="goTab('toji')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
-    Toji<div class="bn-dot"></div>
-  </button>
-  <button class="bn-item" id="bn-jinwoo" onclick="goTab('jinwoo')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
-    Jin-Woo<div class="bn-dot"></div>
-  </button>
   <button class="bn-item" id="bn-nutrition" onclick="goTab('nutrition')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
     Nutrition<div class="bn-dot"></div>
   </button>
-  <button class="bn-item" id="bn-history" onclick="goTab('history')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    History<div class="bn-dot"></div>
+  <button class="bn-item" id="bn-progress" onclick="goTab('progress')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Progress<div class="bn-dot"></div>
   </button>
-  <button class="bn-item" id="bn-chat" onclick="goTab('chat')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
-    Coach<div class="bn-dot"></div>
+  <button class="bn-item" id="bn-more" onclick="goTab('more')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+    More<div class="bn-dot"></div>
   </button>
-  <button class="bn-item" id="bn-armwrestling" onclick="goTab('armwrestling')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8a5 5 0 0 0-10 0v6a5 5 0 0 0 10 0V8z"/><path d="M12 2v6"/><path d="M6 14a5 5 0 0 0 10 0"/></svg>
-    Arm Wr.<div class="bn-dot"></div>
-  </button>
-  <button class="bn-item" id="bn-profile" onclick="goTab('profile')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    Profile<div class="bn-dot"></div>
-  </button>
+  <!-- Hidden items kept for goTab() active-state lookups from existing code -->
+  <button class="bn-item" id="bn-levelup"      style="display:none;" onclick="goTab('levelup')"></button>
+  <button class="bn-item" id="bn-history"      style="display:none;" onclick="goTab('history')"></button>
+  <button class="bn-item" id="bn-profile"      style="display:none;" onclick="goTab('profile')"></button>
+  <button class="bn-item" id="bn-chat"         style="display:none;" onclick="goTab('chat')"></button>
+  <button class="bn-item" id="bn-armwrestling" style="display:none;" onclick="goTab('armwrestling')"></button>
+  <button class="bn-item" id="bn-toji"         style="display:none;" onclick="goTab('toji')"></button>
+  <button class="bn-item" id="bn-jinwoo"       style="display:none;" onclick="goTab('jinwoo')"></button>
 </nav>
 
 <!-- ════ AUTH OVERLAY — Login / Signup ════ -->
@@ -4464,6 +4712,8 @@ const PAGE_META={
   history:   {title:'HISTORY',     sub:'Every session you have completed'},
   chat:      {title:'ELITE COACH',  sub:'Rule-based analysis of your real training data'},
   profile:   {title:'PROFILE',     sub:'Your stats & personal records'},
+  progress:  {title:'PROGRESS',    sub:'Stats · History · Profile'},
+  more:      {title:'MORE',        sub:'Advanced features & settings'},
 };
 function goTab(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));
@@ -4471,13 +4721,25 @@ function goTab(id){
   const pg=document.getElementById('page-'+id);
   if(!pg){ console.warn('goTab: no page for',id); return; }
   pg.classList.add('show');
-  const bn=document.getElementById('bn-'+id); if(bn)bn.classList.add('active');
-  const sn=document.getElementById('sn-'+id); if(sn)sn.classList.add('active');
+  // Activate the 5-item nav buttons, or map sub-pages to their parent nav button
+  const navMap={levelup:'progress',history:'progress',profile:'progress',chat:'more',armwrestling:'more',toji:'more',jinwoo:'more'};
+  const navId = navMap[id] || id;
+  const bn=document.getElementById('bn-'+navId); if(bn)bn.classList.add('active');
+  const sn=document.getElementById('sn-'+navId); if(sn)sn.classList.add('active');
   // Persist active tab so refresh restores position
   try{ sessionStorage.setItem('ef_tab', id); }catch(e){}
   const meta=PAGE_META[id]||{title:id.toUpperCase(),sub:''};
   const tt=document.getElementById('topbarTitle'); if(tt)tt.textContent=meta.title;
   const ts=document.getElementById('topbarSub');   if(ts)ts.textContent=meta.sub;
+  // Update Progress page segmented control active state for sub-pages
+  if(id==='history' || id==='profile' || id==='levelup' || id==='progress'){
+    ['stats','history','profile'].forEach(t=>{
+      const btn=document.getElementById('progBtn'+t.charAt(0).toUpperCase()+t.slice(1));
+      if(!btn) return;
+      const isActive = (id==='history'&&t==='history')||(id==='profile'&&t==='profile')||((id==='levelup'||id==='progress')&&t==='stats');
+      btn.classList.toggle('active', isActive);
+    });
+  }
   // page-specific renders — all in one place, no wrapper chains
   if(id==='levelup'){
     setTimeout(animMuscles,100);
@@ -4491,12 +4753,14 @@ function goTab(id){
   if(id==='home')      { if(typeof renderModeAwareHome==='function') renderModeAwareHome(); if(typeof renderHomeHistoryPreview==='function') renderHomeHistoryPreview(); }
   if(id==='chat')      { renderEliteCoach(); }
   if(id==='workout')   { renderWorkouts(); setTimeout(checkDeloadBanner, 400); }
+  // armwrestling: render page but do NOT auto-launch the onboarding modal
   if(id==='armwrestling') setTimeout(()=>{
     if(typeof renderAWPage==='function') renderAWPage();
-    const tm=L('awTrainingMode',null);
-    if(!tm){ const m=document.getElementById('awOnboardModal'); if(m) m.classList.add('open'); }
+    // awOnboardModal intentionally NOT auto-launched — accessible via goTab('armwrestling') by user choice
   },80);
   if(id==='profile')   setTimeout(()=>{if(typeof renderAWProfileSection==='function')renderAWProfileSection();},150);
+  // Progress page: activate stats tab after renderAll populates source elements
+  if(id==='progress'){ setTimeout(()=>switchProgressTab('stats'),100); }
   renderAll();
   const pw=document.querySelector('.pages-wrap'); if(pw) pw.scrollTop=0;
 }
@@ -6399,17 +6663,12 @@ function applyModeTheme(){
                                activeMode==='jinwoo'? 'Quests' : 'Workout';
   }
 
-  // ── Show/hide character nav items ──
-  const snToji   = document.getElementById('sn-toji');
-  const snJinwoo = document.getElementById('sn-jinwoo');
-  const bnToji   = document.getElementById('bn-toji');
-  const bnJinwoo = document.getElementById('bn-jinwoo');
-
-  // Remove the class so they can be shown, or keep it hidden
-  if(snToji){   snToji.classList.toggle('sn-mode-char',   activeMode!=='toji');   if(activeMode==='toji')   snToji.style.display='flex';   else snToji.style.display='none'; }
-  if(snJinwoo){ snJinwoo.classList.toggle('sn-mode-char', activeMode!=='jinwoo'); if(activeMode==='jinwoo') snJinwoo.style.display='flex'; else snJinwoo.style.display='none'; }
-  if(bnToji){   bnToji.style.display   = activeMode==='toji'   ? 'flex' : 'none'; }
-  if(bnJinwoo){ bnJinwoo.style.display = activeMode==='jinwoo' ? 'flex' : 'none'; }
+  // ── Character nav items — kept hidden always (accessible via More page) ──
+  // These elements exist for goTab() lookups only and must not appear in the primary nav.
+  ['sn-toji','sn-jinwoo','bn-toji','bn-jinwoo'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
 
   // ── Update logo colour ──
   const logoText = document.querySelector('.logo-text');
@@ -6440,11 +6699,177 @@ window.confirmMode = function(){
   goTab('home');
 };
 
-/* Show mode selector on very first visit */
+/* Show mode selector on very first visit — DISABLED: mode selector is now in the More page.
+   Users discover it naturally via More → Switch Training Mode, or after the 3-day streak banner. */
 function checkFirstVisit(){
-  // Show mode selector on very first visit (before onboarding completes or on fresh load)
-  if(!L('modeChosen',false) && L('onboarded',null)){
-    setTimeout(()=>openModeSelector(),800);
+  // Intentionally a no-op: modeOverlay is no longer auto-launched.
+  // Mode selection is accessible from the More page at any time.
+}
+
+/* ══════════════════════════════════════════════════════
+   PROGRESS PAGE — segmented tab controller
+══════════════════════════════════════════════════════ */
+let _currentProgressTab = 'stats';
+
+/* ══════════════════════════════════════════════════════
+   PROGRESS PAGE — segmented tab controller
+══════════════════════════════════════════════════════ */
+let _currentProgressTab = 'stats';
+
+window.switchProgressTab = function(tab){
+  _currentProgressTab = tab;
+
+  // Profile tab — navigate to the standalone profile page
+  if(tab === 'profile'){
+    goTab('profile');
+    return;
+  }
+  // History tab — navigate to the standalone history page
+  if(tab === 'history'){
+    goTab('history');
+    return;
+  }
+
+  // Stats tab — update segmented button states only (page-progress is already shown by goTab)
+  ['stats','history','profile'].forEach(t=>{
+    const btn = document.getElementById('progBtn'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(btn) btn.classList.toggle('active', t===tab);
+  });
+
+  // Show the stats tab panel
+  const tabEl = document.getElementById('progTabStats');
+  if(tabEl) tabEl.classList.add('show');
+
+  // Render stats content — delayed so renderAll() source elements are ready
+  setTimeout(renderLevelUpProgress, 80);
+};
+
+/* Render Level Up content into page-progress Stats tab
+   Copies from already-rendered source elements (renderAll already ran renderLevelUp).
+   Called with a small delay after renderAll() to ensure source elements are populated. */
+function renderLevelUpProgress(){
+  const s=calcStreak();
+  // Rank tiers — copy from renderLevelUp's output
+  const rt2 = document.getElementById('rankTiers2');
+  const rt1 = document.getElementById('rankTiers');
+  if(rt2 && rt1 && rt1.innerHTML){ rt2.innerHTML = rt1.innerHTML; }
+
+  // Muscle list — ensure animMuscles has run on the source, then copy
+  if(!document.querySelector('#muscleListEl .m-row')) animMuscles();
+  const ml2 = document.getElementById('muscleListEl2');
+  const ml1 = document.getElementById('muscleListEl');
+  if(ml2 && ml1 && ml1.innerHTML){
+    ml2.innerHTML = ml1.innerHTML;
+    setTimeout(()=>ml2.querySelectorAll('.m-bar-fg[data-w]').forEach(b=>{b.style.width=b.dataset.w+'%';}),50);
+  }
+
+  // Weekly report stats
+  const now=new Date();
+  const weekStart=new Date(now);
+  weekStart.setDate(now.getDate()-now.getDay());
+  const hist=L('history',[]);
+  const thisWeek=hist.filter(h=>{const d=new Date(h.date);return d>=weekStart;});
+  const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setV('rXP2', thisWeek.reduce((acc,h)=>acc+(h.xp||0),0).toLocaleString());
+  setV('rWO2', thisWeek.length);
+  setV('rST2', s);
+  setV('rPR2', thisWeek.reduce((acc,h)=>acc+(h.newPRs||0),0));
+
+  // Weight tracker
+  const wl=L('wlog',[]);
+  const wtel2=document.getElementById('wtCurrent2');
+  const wtdl2=document.getElementById('wtDelta2');
+  if(wtel2) wtel2.textContent=wl.length?wl[wl.length-1].w+' kg':'— kg';
+  if(wtdl2){
+    if(wl.length>=2){
+      const diff=(wl[wl.length-1].w - wl[0].w).toFixed(1);
+      wtdl2.textContent=(parseFloat(diff)>0?'+':'')+diff+' kg since start';
+      wtdl2.className='wi-delta '+(parseFloat(diff)>0?'up':'down');
+    } else {
+      wtdl2.textContent='';
+    }
+  }
+  // Copy rendered weight chart SVG (renderWeightChart already ran via renderLevelUp)
+  const wcSrc=document.getElementById('wtChart');
+  const wcDst=document.getElementById('wtChart2');
+  if(wcSrc && wcDst){ wcDst.innerHTML=wcSrc.innerHTML; }
+
+  // Exercise selector — populate then copy
+  if(!document.querySelector('#expExSelect option[value]:not([value=""])')) populateExSelector();
+  const sel2=document.getElementById('expExSelect2');
+  const sel1=document.getElementById('expExSelect');
+  if(sel2 && sel1){ sel2.innerHTML = sel1.innerHTML; }
+  renderExChart2();
+}
+
+window.logWeightProg = function(){
+  const inp=document.getElementById('wtInput2');
+  if(!inp||!inp.value) return;
+  const w=parseFloat(inp.value);
+  if(isNaN(w)||w<30||w>300){ showToast('❌ Enter a valid weight (30–300 kg)'); return; }
+  const today=new Date().toISOString().split('T')[0];
+  wlog=L('wlog',[]);
+  const last=wlog[wlog.length-1];
+  if(last&&last.date===today){ last.w=w; } else { wlog.push({date:today,w}); }
+  S('wlog',wlog);
+  inp.value='';
+  showToast('⚖️ Weight logged!');
+  renderLevelUpProgress();
+  // Also sync the original weight tracker
+  const inp1=document.getElementById('wtInput');
+  if(inp1){ inp1.value=''; }
+  if(typeof renderLevelUp==='function') renderLevelUp();
+};
+
+window.renderExChart2 = function(){
+  const sel=document.getElementById('expExSelect2');
+  if(!sel) return;
+  const exName=sel.value;
+  const empty=document.getElementById('expEmpty2');
+  const svg=document.getElementById('expSVG2');
+  const stats=document.getElementById('expStats2');
+  if(!exName){ if(empty)empty.style.display=''; if(svg)svg.style.display='none'; if(stats)stats.style.display='none'; return; }
+  // Delegate to main chart renderer by temporarily swapping IDs (non-destructive)
+  const orig = document.getElementById('expExSelect');
+  if(orig){ orig.value = exName; renderExChart(); }
+  // Copy rendered SVG content
+  const srcSVG=document.getElementById('expSVG');
+  const srcStats=document.getElementById('expStats');
+  const srcEmpty=document.getElementById('expEmpty');
+  if(svg && srcSVG){ svg.innerHTML=srcSVG.innerHTML; svg.style.display=srcSVG.style.display; }
+  if(stats && srcStats){ stats.innerHTML=srcStats.innerHTML; stats.style.display=srcStats.style.display; }
+  if(empty && srcEmpty){ empty.style.display=srcEmpty.style.display; }
+};
+
+/* Render history into page-progress History tab — now handled by goTab('history') */
+/* Render profile into page-progress Profile tab — now handled by goTab('profile') */
+
+/* Render profile into page-progress Profile tab
+   Since renderProfile targets page-profile IDs (forms, inputs, event handlers),
+   the safest approach is to navigate directly to page-profile when the Profile
+   tab is selected within the progress page. This preserves full functionality. */
+function renderProfileProgress(){
+  // Navigate to the standalone profile page — all event handlers work correctly
+  goTab('profile');
+}
+
+/* ══════════════════════════════════════════════════════
+   PROGRESSIVE DISCOVERY BANNERS
+══════════════════════════════════════════════════════ */
+function checkDiscoveryBanners(){
+  // Only show after onboarding is done
+  if(!L('onboarded',null)) return;
+
+  // Training Mode unlock: streak >= 3 AND not yet seen
+  if(calcStreak() >= 3 && !L('modeUnlockSeen', false)){
+    const el=document.getElementById('discBannerMode');
+    if(el) el.style.display='';
+  }
+
+  // Arm Wrestling unlock: completed workouts >= 5 AND not yet seen
+  if(L('wos',0) >= 5 && !L('awUnlockSeen', false)){
+    const el=document.getElementById('discBannerAW');
+    if(el) el.style.display='';
   }
 }
 
@@ -6546,7 +6971,7 @@ function renderHomeHistoryPreview(){
     const col = modeColor[h.mode] || 'var(--cyan)';
     let ago = '';
     try { ago = getTimeAgo(new Date(h.date)); } catch(e){ ago = 'Recently'; }
-    return `<div class="home-hist-item" onclick="goTab('history')">
+    return `<div class="home-hist-item" onclick="goTab('progress');setTimeout(()=>switchProgressTab('history'),100)">
       <div class="hhi-ico" style="background:${col}15;">${h.ico || '💪'}</div>
       <div class="hhi-info"><div class="hhi-name">${esc(h.name)}</div><div class="hhi-meta">${ago}</div></div>
       <div class="hhi-xp" style="color:${col};">+${h.xp || 0} XP</div>
@@ -6733,6 +7158,8 @@ function renderModeAwareHome(){
     }
   }
   renderHomeHistoryPreview();
+  // Check for progressive discovery banners (streak unlock, AW unlock)
+  checkDiscoveryBanners();
 }
 
 /* ══════════════════════════════════════════════════════
@@ -6999,6 +7426,8 @@ window.obFinish = function(){
   S('profile', profile);
   if(weight){ wlog = [{date: new Date().toISOString().split('T')[0], w: weight}]; S('wlog', wlog); }
 
+  // Always start in normal mode — do not auto-launch modeOverlay or awOnboardModal
+  activeMode   = 'normal';
   normalGoal   = obGoalVal;
   normalSplit  = GOAL_TO_SPLIT[normalGoal] || 'ppl';
   S('normalGoal', normalGoal);
@@ -7011,7 +7440,7 @@ window.obFinish = function(){
   document.getElementById('onboardOverlay').classList.add('done');
   renderWorkouts();
   renderAll();
-  // Navigate straight to workout tab so they see their plan immediately
+  // Navigate straight to workout tab — no interruptions
   setTimeout(() => {
     goTab('workout');
     showToast('🚀 Welcome, ' + name + '! Your plan is ready.');
@@ -9194,7 +9623,7 @@ function showAccountMenu(){
       <div style="font-size:.62rem;color:var(--muted);">${email}</div>
     </div>
     <button onclick="manualSync()" style="width:100%;padding:.7rem 1rem;background:none;border:none;color:var(--txt);font-size:.75rem;text-align:left;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:.6rem;">${syncLabel}</button>
-    <button onclick="goTab('profile');document.getElementById('accountMenu')?.remove();" style="width:100%;padding:.7rem 1rem;background:none;border:none;color:var(--txt);font-size:.75rem;text-align:left;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:.6rem;">👤 View Profile</button>
+    <button onclick="goTab('progress');setTimeout(()=>switchProgressTab('profile'),100);document.getElementById('accountMenu')?.remove();" style="width:100%;padding:.7rem 1rem;background:none;border:none;color:var(--txt);font-size:.75rem;text-align:left;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:.6rem;">👤 View Profile</button>
     <button onclick="exportUserData();document.getElementById('accountMenu')?.remove();" style="width:100%;padding:.7rem 1rem;background:none;border:none;color:var(--txt);font-size:.75rem;text-align:left;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:.6rem;">📥 Export My Data</button>
     <button onclick="authSignOut()" style="width:100%;padding:.7rem 1rem;background:none;border:none;color:#E74C3C;font-size:.75rem;text-align:left;cursor:pointer;font-family:Inter,sans-serif;border-top:1px solid var(--line);display:flex;align-items:center;gap:.6rem;">🚪 Sign Out</button>
   `;
@@ -10095,7 +10524,7 @@ function _coachRenderActions(hist, daysSinceAny, trainedToday, deload, week, pha
     actions.push({
       title: '🏆 Review Your New PR',
       sub: 'You have a new personal record. Set your next target.',
-      onclick: `goTab('levelup')`
+      onclick: `goTab('progress')`
     });
   }
 
@@ -10120,7 +10549,7 @@ function _coachRenderActions(hist, daysSinceAny, trainedToday, deload, week, pha
     actions.push({
       title: '📊 View Progress Chart',
       sub: 'Track your strength trends over time.',
-      onclick: `goTab('levelup')`
+      onclick: `goTab('progress')`
     });
   }
 
@@ -10131,7 +10560,7 @@ function _coachRenderActions(hist, daysSinceAny, trainedToday, deload, week, pha
         <div class="coach-action-text">
           <div class="coach-action-title">${a.title}</div>
           <div class="coach-action-sub">${a.sub}</div>
-        </div>
+        </div> 
         <div class="coach-action-arrow">›</div>
       </div>`).join('') + `</div>`;
 }
