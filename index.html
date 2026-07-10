@@ -6709,12 +6709,12 @@ function checkFirstVisit(){
 /* ══════════════════════════════════════════════════════
    PROGRESS PAGE — segmented tab controller
 ══════════════════════════════════════════════════════ */
-// let _currentProgressTab = 'stats';
+let _currentProgressTab = 'stats';
 
 /* ══════════════════════════════════════════════════════
    PROGRESS PAGE — segmented tab controller
 ══════════════════════════════════════════════════════ */
-let _currentProgressTab = 'stats';
+/* let _currentProgressTab = 'stats'; */
 
 window.switchProgressTab = function(tab){
   _currentProgressTab = tab;
@@ -8872,7 +8872,7 @@ window.finishAWSession=function(){
     xp: earned, sets: _awSessDone, duration: _awSessSeconds,
     mode: L('activeMode','normal'),
     muscles: ['back','chest','forearms'],
-    type: 'armwrestling'
+    type:'armwrestling'
   });
   S('history', hist.slice(0, 200));
   /* Streak */
